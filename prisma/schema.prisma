@@ -1,0 +1,69 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Used for non-pooled connections (Supabase)
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id // Corresponds to Supabase auth.users.id
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progress       StudentProgress?
+  speechAttempts SpeechAttempt[]
+  learningPlans  LearningPlan[]
+
+  @@map("users")
+}
+
+model StudentProgress {
+  id                  String   @id @default(uuid())
+  userId              String   @unique @map("user_id")
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spokenEnglishLevel String   @default("Beginner") @map("spoken_english_level")
+  vocabularyScore     Int      @default(0) @map("vocabulary_score")
+  pronunciationScore  Int      @default(0) @map("pronunciation_score")
+  confidenceScore     Int      @default(0) @map("confidence_score")
+  careerGoal          String?  @map("career_goal")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  @@map("student_progress")
+}
+
+model SpeechAttempt {
+  id                 String   @id @default(uuid())
+  userId             String   @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transcription      String   @db.Text
+  targetText         String?  @map("target_text") @db.Text
+  durationSeconds    Int      @map("duration_seconds")
+  pronunciationScore Int      @map("pronunciation_score")
+  fluencyScore       Int      @map("fluency_score")
+  feedbackJson       Json     @map("feedback_json")
+  audioUrl           String?  @map("audio_url")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("speech_attempts")
+}
+
+model LearningPlan {
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                String
+  description          String?   @db.Text
+  tasksJson            Json      @map("tasks_json") // Structure: [{ id, title, description, completed, type }]
+  status               String    @default("active") // "active" | "completed" | "archived"
+  targetCompletionDate DateTime? @map("target_completion_date")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@map("learning_plans")
+}
