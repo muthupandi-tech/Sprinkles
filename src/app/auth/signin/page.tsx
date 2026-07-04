@@ -1,10 +1,59 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
+import { Sparkles, Mail, Lock, ArrowRight, AlertCircle, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { signIn, signInWithGoogle } from "../actions";
 
 export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await signIn(email, password);
+      if (!res.success) {
+        setError(res.error || "Failed to sign in.");
+      } else {
+        setSuccess("Signed in successfully! Redirecting...");
+        // Wait briefly and redirect to dashboard
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await signInWithGoogle();
+      if (res && !res.success) {
+        setError(res.error || "Google authentication failed.");
+        setLoading(false);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Google authentication failed.";
+      setError(message);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-20">
       <motion.div
@@ -25,10 +74,26 @@ export default function SignIn() {
           <p className="mt-1 text-sm text-gray-500">Sign in to resume your communication lessons</p>
         </div>
 
+        {/* Success & Error Indicators */}
+        {error && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <p>{error}</p>
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-green-100 bg-green-50 p-3 text-sm text-green-700">
+            <CheckCircle className="h-4 w-4 shrink-0" />
+            <p>{success}</p>
+          </div>
+        )}
+
         {/* OAuth Provider */}
         <button
-          onClick={() => console.log("Google Sign In")}
-          className="mb-6 flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+          onClick={handleGoogleSignIn}
+          disabled={loading}
+          type="button"
+          className="mb-6 flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
         >
           <svg
             className="h-4 w-4"
@@ -54,7 +119,7 @@ export default function SignIn() {
               fill="#EA4335"
             />
           </svg>
-          <span>Continue with Google</span>
+          <span>{loading ? "Redirecting..." : "Continue with Google"}</span>
         </button>
 
         <div className="mb-6 flex items-center gap-3">
@@ -64,7 +129,7 @@ export default function SignIn() {
         </div>
 
         {/* Email sign in */}
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+        <form onSubmit={handleSignIn} className="space-y-4">
           <div>
             <label className="mb-1.5 block text-xs font-semibold tracking-wider text-gray-400 uppercase">
               Email Address
@@ -74,8 +139,11 @@ export default function SignIn() {
               <input
                 type="email"
                 placeholder="you@university.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="focus:border-primary w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pr-4 pl-10 text-sm transition-colors focus:bg-white focus:outline-none"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -89,17 +157,21 @@ export default function SignIn() {
               <input
                 type="password"
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="focus:border-primary w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pr-4 pl-10 text-sm transition-colors focus:bg-white focus:outline-none"
                 required
+                disabled={loading}
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="bg-primary hover:bg-primary-hover flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-md transition-colors"
+            disabled={loading}
+            className="bg-primary hover:bg-primary-hover flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-md transition-colors disabled:opacity-50"
           >
-            <span>Sign In</span>
+            <span>{loading ? "Signing In..." : "Sign In"}</span>
             <ArrowRight className="h-4 w-4" />
           </button>
         </form>
