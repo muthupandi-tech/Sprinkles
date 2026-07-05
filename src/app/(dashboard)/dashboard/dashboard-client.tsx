@@ -497,7 +497,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
                       <div className="flex items-baseline justify-between">
                         <h4 className="text-xs font-bold text-gray-900">{sess.type} Practice</h4>
                         <span className="text-[10px] text-gray-400">
-                          {new Date(sess.createdAt).toLocaleDateString(undefined, {
+                          {new Date(sess.createdAt).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                           })}
