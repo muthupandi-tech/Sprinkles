@@ -51,7 +51,6 @@ export default function GDSessionPage({ params }: { params: Promise<{ id: string
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          endSession();
           return 0;
         }
         return prev - 1;
@@ -59,6 +58,12 @@ export default function GDSessionPage({ params }: { params: Promise<{ id: string
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (timeLeft === 0 && !isEnding) {
+      endSession();
+    }
+  }, [timeLeft, isEnding]);
 
   const fetchSession = async () => {
     try {
