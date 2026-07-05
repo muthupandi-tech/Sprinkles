@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, BookOpen, Award, Compass, ArrowRight, X, Play, CheckCircle } from "lucide-react";
+import { Mic, BookOpen, Award, Compass, ArrowRight, X, Play, CheckCircle, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface PracticeModule {
@@ -110,6 +110,26 @@ export default function PracticeCenterPage() {
           "Question 1: 'Tell me about a time when you had to resolve a conflict within your project team.'",
       },
     },
+    {
+      id: "gd",
+      title: "Group Discussion (GD)",
+      desc: "Simulate a live group discussion with AI participants with unique personas. Practice active listening, leadership, and critical thinking.",
+      icon: Users,
+      difficulty: "Advanced",
+      estTime: "5 mins",
+      color: "from-fuchsia-500 to-purple-600 text-white",
+      outlineColor: "border-fuchsia-100 hover:border-fuchsia-300",
+      bubbleColor: "bg-fuchsia-50 text-fuchsia-600",
+      sandboxContent: {
+        prompt: "Group Discussion Simulator",
+        instructions: [
+          "Select a GD Topic and mode.",
+          "Join a dynamic video-call style session with AI participants.",
+          "Turn on your microphone and jump into the discussion.",
+          "You will be evaluated on your leadership and participation."
+        ]
+      },
+    },
   ];
 
   const router = useRouter();
@@ -119,6 +139,8 @@ export default function PracticeCenterPage() {
       router.push("/practice/speech");
     } else if (selectedModule?.id === "interview") {
       router.push("/practice/interview");
+    } else if (selectedModule?.id === "gd") {
+      router.push("/practice/gd");
     } else {
       setSessionActive(true);
     }

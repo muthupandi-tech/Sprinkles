@@ -16,6 +16,7 @@ import {
   Compass,
   ArrowRight,
   TrendingUp,
+  Users,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -182,6 +183,13 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
       href: "/practice/interview",
       icon: Award,
       color: "text-red-600 bg-red-50 border-red-100",
+    },
+    {
+      label: "Group Discussion",
+      desc: "Multi-agent GD simulator",
+      href: "/practice/gd",
+      icon: Users,
+      color: "text-fuchsia-600 bg-fuchsia-50 border-fuchsia-100",
     },
     {
       label: "Progress Analytics",

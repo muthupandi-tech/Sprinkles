@@ -30,6 +30,8 @@ model User {
   coachSuggestions   CoachSuggestion[]
   userVocabularies   UserVocabulary[]
   quizAttempts       VocabularyQuizAttempt[]
+  gdSessions         GroupDiscussionSession[]
+  
   @@map("users")
 }
 
@@ -77,6 +79,7 @@ model Progress {
   vocabularyScore    Float    @default(0.0) @map("vocabulary_score")
   pronunciationScore Float    @default(0.0) @map("pronunciation_score")
   interviewScore     Float    @default(0.0) @map("interview_score")
+  gdScore            Float    @default(0.0) @map("gd_score")
   totalPracticeTime  Int      @default(0) @map("total_practice_time") // in minutes
   weeklyTimeHistory  Json     @map("weekly_time_history") // e.g. [15, 20, 10, 30, 0, 15, 25] for 7 days
   updatedAt          DateTime @updatedAt @map("updated_at")
@@ -295,4 +298,52 @@ model InterviewAnswer {
   createdAt         DateTime          @default(now()) @map("created_at")
 
   @@map("interview_answers")
+}
+
+model GroupDiscussionSession {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic          String
+  category       String         // "Campus Placement", "Technical", "Debate", etc.
+  status         String         @default("in_progress") // "in_progress", "completed"
+  overallScore   Int?           @map("overall_score")
+  feedbackJson   Json?          @map("feedback_json")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @default(now()) @updatedAt @map("updated_at")
+
+  participants   GDParticipant[]
+  messages       GDMessage[]
+
+  @@map("gd_sessions")
+}
+
+model GDParticipant {
+  id          String                 @id @default(uuid())
+  sessionId   String                 @map("session_id")
+  session     GroupDiscussionSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name        String
+  role        String                 // "Leader", "Supporter", "Critical Thinker", "Quiet Observer", "Challenger"
+  avatarUrl   String?                @map("avatar_url")
+  
+  messages    GDMessage[]
+
+  @@map("gd_participants")
+}
+
+model GDMessage {
+  id             String                 @id @default(uuid())
+  sessionId      String                 @map("session_id")
+  session        GroupDiscussionSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  // Either an AI participant or the user/moderator
+  participantId  String?                @map("participant_id")
+  participant    GDParticipant?         @relation(fields: [participantId], references: [id], onDelete: SetNull)
+  
+  speakerName    String                 // Cache the name for quick display
+  speakerRole    String                 // "ai", "user", "moderator"
+  content        String                 @db.Text
+  createdAt      DateTime               @default(now()) @map("created_at")
+
+  @@map("gd_messages")
 }
