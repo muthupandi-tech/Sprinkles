@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, TrendingUp, AlertTriangle, MessageSquare, Mic, Zap, BookOpen } from "lucide-react";
 
-export default async function SpeechResultPage({ params }: { params: { id: string } }) {
+export default async function SpeechResultPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const attempt = await prisma.speechAttempt.findUnique({
-    where: { id: params.id }
+    where: { id }
   });
 
   if (!attempt) {

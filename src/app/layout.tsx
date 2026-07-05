@@ -1,7 +1,5 @@
 import Head from "next/head";
-import { Navbar } from "@/components/shared/navbar";
 import CleanBodyAttributes from "@/components/CleanBodyAttributes";
-import { Footer } from "@/components/shared/footer";
 import "./globals.css";
 import type { Metadata } from "next";
 
@@ -37,9 +35,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: "document.body.removeAttribute('data-new-gr-c-s-check-loaded');document.body.removeAttribute('data-gr-ext-installed');" }} />
       </Head>
       <body className="bg-background-app flex min-h-full flex-col text-gray-900 font-sans"><CleanBodyAttributes />
-        <Navbar />
         <main className="flex flex-grow flex-col">{children}</main>
-        <Footer />
       </body>
     </html>
   );
