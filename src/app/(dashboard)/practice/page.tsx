@@ -117,6 +117,8 @@ export default function PracticeCenterPage() {
   const handleStartSession = () => {
     if (selectedModule?.id === "speech") {
       router.push("/practice/speech");
+    } else if (selectedModule?.id === "interview") {
+      router.push("/practice/interview");
     } else {
       setSessionActive(true);
     }

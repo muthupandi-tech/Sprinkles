@@ -48,6 +48,10 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
       };
 
       recognition.onerror = (event: any) => {
+        const err = event.error || "";
+        if (err === "no-speech" || err === "aborted" || err.includes("no-speech")) {
+          return;
+        }
         console.error("Speech recognition error", event.error);
       };
 

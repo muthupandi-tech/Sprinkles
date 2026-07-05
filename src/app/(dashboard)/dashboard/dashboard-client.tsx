@@ -179,7 +179,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     {
       label: "Mock Interview",
       desc: "Interactive behavioral prep",
-      href: "/practice",
+      href: "/practice/interview",
       icon: Award,
       color: "text-red-600 bg-red-50 border-red-100",
     },

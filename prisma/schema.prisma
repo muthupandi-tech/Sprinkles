@@ -137,16 +137,19 @@ model VocabularyProgress {
 }
 
 model InterviewSession {
-  id              String   @id @default(uuid())
-  userId          String   @map("user_id")
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobTitle        String   @map("job_title")
-  company         String?
-  durationMinutes Int      @map("duration_minutes")
-  overallScore    Int      @map("overall_score")
-  feedback        String?  @db.Text
-  questionsJson   Json     @map("questions_json") // [{ question: string, answer: string, score: number, feedback: string }]
-  createdAt       DateTime @default(now()) @map("created_at")
+  id             String              @id @default(uuid())
+  userId         String              @map("user_id")
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company        String              // "TCS", "Google", "Custom", etc.
+  interviewType  String              // "HR", "Technical", "Behavioral", etc.
+  resumeContext  String?             @db.Text // Extracted text from uploaded resume
+  status         String              @default("in_progress") // "in_progress", "completed"
+  overallScore   Int?                @map("overall_score")
+  feedbackJson   Json?               @map("feedback_json") // High-level strengths, weaknesses, tips
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @default(now()) @updatedAt @map("updated_at")
+
+  questions      InterviewQuestion[]
 
   @@map("interview_sessions")
 }
@@ -263,4 +266,33 @@ model VocabularyQuizAttempt {
   createdAt      DateTime @default(now()) @map("created_at")
 
   @@map("vocabulary_quiz_attempts")
+}
+
+
+model InterviewQuestion {
+  id             String           @id @default(uuid())
+  sessionId      String           @map("session_id")
+  session        InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionText   String           @db.Text
+  order          Int
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  answer         InterviewAnswer?
+
+  @@map("interview_questions")
+}
+
+model InterviewAnswer {
+  id                String            @id @default(uuid())
+  questionId        String            @unique @map("question_id")
+  question          InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  studentAnswer     String            @db.Text
+  grammarScore      Int
+  fluencyScore      Int
+  technicalAccuracy Int
+  overallScore      Int
+  feedbackJson      Json              @map("feedback_json") // Granular feedback, better sample answer
+  createdAt         DateTime          @default(now()) @map("created_at")
+
+  @@map("interview_answers")
 }
