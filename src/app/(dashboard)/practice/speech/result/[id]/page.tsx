@@ -121,8 +121,12 @@ export default async function SpeechResultPage({ params }: { params: { id: strin
             </h3>
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500">Speaking Pace</p>
-                <p className="font-medium text-gray-900">{feedback.speakingPace}</p>
+                <p className="text-xs text-gray-500">Speaking Pace & Speed</p>
+                <p className="font-medium text-gray-900">{feedback.speakingPace} ({feedback.speakingSpeedWpm ? `${feedback.speakingSpeedWpm} WPM` : 'N/A'})</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Pause Analysis</p>
+                <p className="text-sm text-gray-700">{feedback.pauseAnalysis || "No pause analysis available."}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Confidence Score</p>
