@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, BookOpen, Award, Compass, ArrowRight, X, Play, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface PracticeModule {
   id: string;
@@ -111,8 +112,14 @@ export default function PracticeCenterPage() {
     },
   ];
 
+  const router = useRouter();
+
   const handleStartSession = () => {
-    setSessionActive(true);
+    if (selectedModule?.id === "speech") {
+      router.push("/practice/speech");
+    } else {
+      setSessionActive(true);
+    }
   };
 
   const handleCompleteSession = () => {
