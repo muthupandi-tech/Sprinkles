@@ -27,6 +27,7 @@ model User {
   notifications      Notification[]
   learningPlans      LearningPlan[]
   speechAttempts     SpeechAttempt[]
+  coachSuggestions   CoachSuggestion[]
   @@map("users")
 }
 
@@ -85,10 +86,11 @@ model Conversation {
   id        String    @id @default(uuid())
   userId    String    @map("user_id")
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  messages  Message[]
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  title            String
+  messages         Message[]
+  coachSuggestions CoachSuggestion[]
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
   @@map("conversations")
 }
@@ -200,4 +202,17 @@ model SpeechAttempt {
   createdAt          DateTime @default(now()) @map("created_at")
 
   @@map("speech_attempts")
+}
+
+model CoachSuggestion {
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversationId String?       @map("conversation_id")
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  type           String        // "vocabulary" | "grammar" | "tip" | "challenge"
+  content        String        @db.Text
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  @@map("coach_suggestions")
 }

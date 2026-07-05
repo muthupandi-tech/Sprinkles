@@ -29,6 +29,8 @@ import {
   CartesianGrid,
 } from "recharts";
 import { toggleMission } from "@/app/actions/profile";
+import { LearningPlanWidget } from "@/components/dashboard/LearningPlanWidget";
+import { SmartSuggestionsWidget } from "@/components/dashboard/SmartSuggestionsWidget";
 
 interface Mission {
   id: string;
@@ -411,6 +413,9 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
         {/* Right Column: Daily Mission & Activity */}
         <div className="space-y-6">
+          <LearningPlanWidget />
+          <SmartSuggestionsWidget />
+
           {/* Daily Missions Card */}
           <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <div>

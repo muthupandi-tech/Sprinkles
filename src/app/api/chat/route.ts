@@ -24,6 +24,12 @@ export async function POST(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    const profile = await prisma.studentProfile.findUnique({
+      where: { userId: user.id }
+    });
+
+    const dynamicSystemPrompt = `${systemPrompt}\n\nUser Context:\n- Name: ${profile?.fullName || "Student"}\n- English Level: ${profile?.englishProficiency || "Beginner"}\n- Preferred Accent: ${profile?.preferredAccent || "American"}\n- Target Career/Company: ${profile?.careerGoal || "Not specified"} at ${profile?.targetCompany || "Not specified"}`;
+
     const { messages, conversationId } = await req.json() as { messages: { role: string, content: string }[], conversationId?: string };
 
     let currentConversationId = conversationId;
@@ -59,7 +65,7 @@ export async function POST(req: Request) {
 
     const result = await streamText({
       model: openrouter("openai/gpt-4o-mini"),
-      system: systemPrompt,
+      system: dynamicSystemPrompt,
       messages: messages as any,
       async onFinish({ text }) {
         await prisma.message.create({
