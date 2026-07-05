@@ -12,29 +12,166 @@ model User {
   id        String   @id // Corresponds to Supabase auth.users.id
   email     String   @unique
   name      String?
-  avatarUrl String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  progress       StudentProgress?
-  speechAttempts SpeechAttempt[]
-  learningPlans  LearningPlan[]
-
+  profile            StudentProfile?
+  progress           Progress?
+  missions           DailyMission[]
+  conversations      Conversation[]
+  sessions           PracticeSession[]
+  vocabularies       VocabularyProgress[]
+  interviews         InterviewSession[]
+  achievements       Achievement[]
+  notifications      Notification[]
+  learningPlans      LearningPlan[]
+  speechAttempts     SpeechAttempt[]
   @@map("users")
 }
 
-model StudentProgress {
-  id                  String   @id @default(uuid())
-  userId              String   @unique @map("user_id")
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  spokenEnglishLevel String   @default("Beginner") @map("spoken_english_level")
-  vocabularyScore     Int      @default(0) @map("vocabulary_score")
-  pronunciationScore  Int      @default(0) @map("pronunciation_score")
-  confidenceScore     Int      @default(0) @map("confidence_score")
-  careerGoal          String?  @map("career_goal")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+model StudentProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName           String?  @map("full_name")
+  avatarUrl          String?  @map("avatar_url")
+  college            String?
+  department         String?
+  yearOfStudy        String?  @map("year_of_study") // "1st Year", "2nd Year", etc.
+  careerGoal         String?  @map("career_goal")
+  targetCompany      String?  @map("target_company")
+  englishProficiency String   @default("Beginner") @map("english_proficiency") // "Beginner", "Intermediate", "Advanced"
+  preferredAccent    String   @default("American") @map("preferred_accent") // "American", "British", "Indian"
+  dailyPracticeGoal  Int      @default(15) @map("daily_practice_goal") // in minutes
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
-  @@map("student_progress")
+  @@map("student_profiles")
+}
+
+model DailyMission {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?  @db.Text
+  type        String // "vocabulary" | "speaking" | "pronunciation" | "interview"
+  points      Int      @default(10)
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("daily_missions")
+}
+
+model Progress {
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentStreak      Int      @default(0) @map("current_streak")
+  overallScore       Float    @default(0.0) @map("overall_score") // 0-100 communication score
+  speakingScore      Float    @default(0.0) @map("speaking_score")
+  vocabularyScore    Float    @default(0.0) @map("vocabulary_score")
+  pronunciationScore Float    @default(0.0) @map("pronunciation_score")
+  interviewScore     Float    @default(0.0) @map("interview_score")
+  totalPracticeTime  Int      @default(0) @map("total_practice_time") // in minutes
+  weeklyTimeHistory  Json     @map("weekly_time_history") // e.g. [15, 20, 10, 30, 0, 15, 25] for 7 days
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("progress_records")
+}
+
+model Conversation {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  messages  Json // [{ role: "user" | "assistant", content: string, timestamp: string }]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("conversations")
+}
+
+model PracticeSession {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type            String // "Speaking" | "Pronunciation" | "Vocabulary"
+  durationMinutes Int      @map("duration_minutes")
+  score           Int      @default(0)
+  feedback        String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("practice_sessions")
+}
+
+model VocabularyProgress {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word         String
+  definition   String?
+  learned      Boolean  @default(false)
+  masteryLevel Int      @default(0) @map("mastery_level") // e.g. 0-5
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("vocabulary_progress")
+}
+
+model InterviewSession {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle        String   @map("job_title")
+  company         String?
+  durationMinutes Int      @map("duration_minutes")
+  overallScore    Int      @map("overall_score")
+  feedback        String?  @db.Text
+  questionsJson   Json     @map("questions_json") // [{ question: string, answer: string, score: number, feedback: string }]
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@map("interview_sessions")
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  iconName    String   @map("icon_name")
+  unlockedAt  DateTime @default(now()) @map("unlocked_at")
+
+  @@map("achievements")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
+}
+
+model LearningPlan {
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                String
+  description          String?   @db.Text
+  tasksJson            Json      @map("tasks_json")
+  status               String    @default("active") // "active", "completed", "archived"
+  targetCompletionDate DateTime? @map("target_completion_date")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  @@map("learning_plans")
 }
 
 model SpeechAttempt {
@@ -44,26 +181,11 @@ model SpeechAttempt {
   transcription      String   @db.Text
   targetText         String?  @map("target_text") @db.Text
   durationSeconds    Int      @map("duration_seconds")
-  pronunciationScore Int      @map("pronunciation_score")
-  fluencyScore       Int      @map("fluency_score")
+  pronunciationScore Float    @map("pronunciation_score")
+  fluencyScore       Float    @map("fluency_score")
   feedbackJson       Json     @map("feedback_json")
   audioUrl           String?  @map("audio_url")
   createdAt          DateTime @default(now()) @map("created_at")
 
   @@map("speech_attempts")
-}
-
-model LearningPlan {
-  id                   String    @id @default(uuid())
-  userId               String    @map("user_id")
-  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title                String
-  description          String?   @db.Text
-  tasksJson            Json      @map("tasks_json") // Structure: [{ id, title, description, completed, type }]
-  status               String    @default("active") // "active" | "completed" | "archived"
-  targetCompletionDate DateTime? @map("target_completion_date")
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt            DateTime  @updatedAt @map("updated_at")
-
-  @@map("learning_plans")
 }

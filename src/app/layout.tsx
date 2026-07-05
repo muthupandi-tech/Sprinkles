@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Navbar } from "@/components/shared/navbar";
 import { Footer } from "@/components/shared/footer";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Sprinkles | AI Personal Communication & Spoken English Coach",
@@ -38,9 +27,11 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
+      className="h-full scroll-smooth antialiased"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
     >
-      <body className="bg-background-app flex min-h-full flex-col text-gray-900">
+      <body className="bg-background-app flex min-h-full flex-col text-gray-900 font-sans">
         <Navbar />
         <main className="flex flex-grow flex-col">{children}</main>
         <Footer />
