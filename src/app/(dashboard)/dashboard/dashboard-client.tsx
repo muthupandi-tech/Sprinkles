@@ -31,6 +31,7 @@ import {
 import { toggleMission } from "@/app/actions/profile";
 import { LearningPlanWidget } from "@/components/dashboard/LearningPlanWidget";
 import { SmartSuggestionsWidget } from "@/components/dashboard/SmartSuggestionsWidget";
+import { VocabularyProgressWidget } from "@/components/dashboard/VocabularyProgressWidget";
 
 interface Mission {
   id: string;
@@ -413,6 +414,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
         {/* Right Column: Daily Mission & Activity */}
         <div className="space-y-6">
+          <VocabularyProgressWidget />
           <LearningPlanWidget />
           <SmartSuggestionsWidget />
 
