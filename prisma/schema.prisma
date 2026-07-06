@@ -31,6 +31,11 @@ model User {
   userVocabularies   UserVocabulary[]
   quizAttempts       VocabularyQuizAttempt[]
   gdSessions         GroupDiscussionSession[]
+  goals              Goal[]
+  recommendations    Recommendation[]
+  weeklyReports      WeeklyReport[]
+  monthlyReports     MonthlyReport[]
+  analytics          Analytics[]
   
   @@map("users")
 }
@@ -346,4 +351,74 @@ model GDMessage {
   createdAt      DateTime               @default(now()) @map("created_at")
 
   @@map("gd_messages")
+}
+
+model Goal {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  type      String   // "practice_time", "interviews", "vocabulary", "streak"
+  target    Int
+  progress  Int      @default(0)
+  deadline  DateTime?
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("goals")
+}
+
+model Recommendation {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  type      String   // "pronunciation", "interview", "vocabulary", "fluency", "general"
+  actionUrl String?  @map("action_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("recommendations")
+}
+
+model WeeklyReport {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate DateTime @map("week_start_date")
+  weekEndDate   DateTime @map("week_end_date")
+  summaryJson  Json     @map("summary_json") // { practiceTime, scoreChanges, insights, recommendations }
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("weekly_reports")
+}
+
+model MonthlyReport {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month        Int      // 1-12
+  year         Int
+  summaryJson  Json     @map("summary_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("monthly_reports")
+}
+
+model Analytics {
+  id                 String   @id @default(uuid())
+  userId             String   @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date               DateTime @db.Date // Store just the date part for daily aggregation
+  practiceTime       Int      @default(0) @map("practice_time")
+  speakingScore      Float?   @map("speaking_score")
+  vocabularyScore    Float?   @map("vocabulary_score")
+  pronunciationScore Float?   @map("pronunciation_score")
+  interviewScore     Float?   @map("interview_score")
+  gdScore            Float?   @map("gd_score")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, date])
+  @@map("analytics")
 }

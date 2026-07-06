@@ -1,5 +1,3 @@
-import Head from "next/head";
-import CleanBodyAttributes from "@/components/CleanBodyAttributes";
 import "./globals.css";
 import type { Metadata } from "next";
 
@@ -31,10 +29,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <Head>
-        <script dangerouslySetInnerHTML={{ __html: "document.body.removeAttribute('data-new-gr-c-s-check-loaded');document.body.removeAttribute('data-gr-ext-installed');" }} />
-      </Head>
-      <body className="bg-background-app flex min-h-full flex-col text-gray-900 font-sans"><CleanBodyAttributes />
+      <body suppressHydrationWarning className="bg-background-app flex min-h-full flex-col text-gray-900 font-sans">
         <main className="flex flex-grow flex-col">{children}</main>
       </body>
     </html>
