@@ -177,28 +177,15 @@ async function main() {
       await prisma.interviewSession.create({
         data: {
           userId: user.id,
-          jobTitle: "Software Engineer Intern",
           company: "Google",
-          durationMinutes: 15,
+          interviewType: "Technical",
+          status: "completed",
           overallScore: 80,
-          feedback:
-            "Excellent technical clarifications and coding layout discussions. Work on structuring behavioral queries using the STAR method.",
-          questionsJson: [
-            {
-              question: "Tell me about yourself.",
-              answer:
-                "I am a third year computer science student at National Engineering College. I enjoy full-stack React and Next.js applications...",
-              score: 85,
-              feedback: "Clear and confident overview.",
-            },
-            {
-              question: "Describe a challenging project you worked on.",
-              answer:
-                "I built Sprinkles, an AI communication coach application that helps students. I integrated Supabase auth and cookies...",
-              score: 75,
-              feedback: "Good, but describe the conflict resolution phase in greater detail.",
-            },
-          ],
+          feedbackJson: {
+            strengths: ["Excellent technical clarifications", "Good coding layout discussions"],
+            weaknesses: ["Work on structuring behavioral queries using the STAR method"],
+            tips: ["Practice more behavioral questions"]
+          }
         },
       });
     }
