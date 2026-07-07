@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Download, FileText, Loader2 } from "lucide-react";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 
 interface ReportDownloaderProps {
   progress: any;

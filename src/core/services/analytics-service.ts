@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
+import { prisma } from "@/infrastructure/database/prisma";
 
-const prisma = new PrismaClient();
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
 });

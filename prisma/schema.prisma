@@ -36,6 +36,9 @@ model User {
   weeklyReports      WeeklyReport[]
   monthlyReports     MonthlyReport[]
   analytics          Analytics[]
+  reminders          Reminder[]
+  calendarEvents     CalendarEvent[]
+  weeklyPlans        WeeklyPlan[]
   
   @@map("users")
 }
@@ -421,4 +424,44 @@ model Analytics {
 
   @@unique([userId, date])
   @@map("analytics")
+}
+
+model Reminder {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  type      String   // "daily_practice", "interview", "review", etc.
+  time      String   // e.g. "09:00"
+  enabled   Boolean  @default(true)
+  days      Int[]    // e.g. [1, 2, 3, 4, 5] for Mon-Fri
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("reminders")
+}
+
+model CalendarEvent {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  date      DateTime 
+  type      String   // "practice", "interview", "mission"
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("calendar_events")
+}
+
+model WeeklyPlan {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  tasksJson Json     @map("tasks_json") // { day: string, tasks: { title: string, completed: boolean }[] }[]
+  status    String   @default("active") // "active", "archived"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("weekly_plans")
 }

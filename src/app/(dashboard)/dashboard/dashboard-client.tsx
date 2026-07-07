@@ -34,6 +34,7 @@ import { LearningPlanWidget } from "@/components/dashboard/LearningPlanWidget";
 import { SmartSuggestionsWidget } from "@/components/dashboard/SmartSuggestionsWidget";
 import { VocabularyProgressWidget } from "@/components/dashboard/VocabularyProgressWidget";
 import { InsightsWidget } from "@/components/dashboard/InsightsWidget";
+import { RemindersWidget } from "@/components/dashboard/RemindersWidget";
 
 interface Mission {
   id: string;
@@ -151,7 +152,14 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
   const actions = [
     {
-      label: "AI Assistant",
+      label: "Personal Assistant",
+      desc: "Daily missions & planner",
+      href: "/assistant",
+      icon: CheckSquare,
+      color: "text-indigo-600 bg-indigo-50 border-indigo-100",
+    },
+    {
+      label: "AI Communication Coach",
       desc: "Chat with your AI coach",
       href: "/ai-assistant",
       icon: Sparkles,
@@ -424,6 +432,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
         {/* Right Column: Daily Mission & Activity */}
         <div className="space-y-6">
           <InsightsWidget />
+          <RemindersWidget />
           <VocabularyProgressWidget />
           <LearningPlanWidget />
           <SmartSuggestionsWidget />
