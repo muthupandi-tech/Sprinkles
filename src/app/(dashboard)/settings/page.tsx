@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Settings,
@@ -26,6 +26,12 @@ export default function SettingsPage() {
     accentFeedback: false,
     newMissions: true,
   });
+
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
@@ -100,7 +106,7 @@ export default function SettingsPage() {
                   key={opt.id}
                   onClick={() => setTheme(opt.id as "light" | "dark" | "system")}
                   className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border p-4 transition-all ${
-                    theme === opt.id
+                    mounted && theme === opt.id
                       ? "border-blue-600 bg-blue-50/30 text-blue-600"
                       : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
                   }`}

@@ -33,8 +33,7 @@ export async function updateSession(request: NextRequest) {
       },
     });
 
-    // Use getSession to avoid Edge runtime network timeouts on Windows local dev
-    await supabase.auth.getSession();
+    await supabase.auth.getUser();
   } catch (error) {
     // Fail silently or log error for unauthenticated requests/placeholder configurations
     console.warn("Supabase session refresh failed:", error);

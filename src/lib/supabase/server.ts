@@ -33,13 +33,6 @@ export async function createClient() {
     }
   );
 
-  if (process.env.NODE_ENV === "development") {
-    // Avoid IPv6 fetch timeouts in local development on Windows
-    client.auth.getUser = async () => {
-      const { data, error } = await client.auth.getSession();
-      return { data: { user: data.session?.user || null }, error } as any;
-    };
-  }
 
   return client;
 }
