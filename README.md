@@ -1,117 +1,88 @@
-# Sprinkles — AI-Powered Personal Communication Coach
+# Sprinkles - AI Personal Communication Coach
 
-Sprinkles is a production-ready, AI-powered Personal Communication Coach designed to help students master spoken English, build presentation confidence, expand academic and corporate vocabulary, correct pronunciation mistakes, and prepare for career-defining interviews. 
+Sprinkles is a next-generation AI-powered communication coach that helps students and professionals master spoken English, enhance vocabulary, and prepare for interviews with realistic AI roleplay. 
 
-It functions as an active AI mentor that monitors student progress and updates personalized learning plans dynamically.
+## Features
 
----
+- **Personalized Dashboard:** Track your daily practice streaks, overall communication scores, and gamified achievements.
+- **AI Speech Coaching:** Receive real-time feedback on pronunciation, fluency, and phoneme enunciation using advanced AI audio transcription.
+- **Mock Interviews:** Conduct realistic behavioral and technical interviews with an AI recruiter, complete with post-interview feedback scoring.
+- **Vocabulary Builder:** Spaced Repetition System (SRS) for learning and retaining new words, with contextual interview examples.
+- **Group Discussions:** Simulate multi-participant group discussions with AI peers to build confidence.
+- **Gamification & Leaderboard:** Earn badges for milestones, keep up daily streaks, and see how you rank among other learners.
+- **Personal AI Assistant:** Get weekly study plans, motivation prompts, and daily missions to keep you on track.
 
-## 🏗️ Architecture & Core Design
+## Architecture
 
-This project adopts **Clean Architecture** principles to separate business logic from framework details, database adapters, and external APIs. This ensures high testability, scalability, and code maintainability as features are added.
+Sprinkles is built using a modern, scalable tech stack:
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **Database:** [PostgreSQL](https://www.postgresql.org/) managed via [Prisma ORM](https://www.prisma.io/)
+- **Authentication:** [Supabase Auth](https://supabase.com/)
+- **AI Integration:** [Vercel AI SDK](https://sdk.vercel.ai/) & OpenAI
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
 
-### Folder Structure
+## Environment Variables
 
-```
-src/
-├── app/                       # Next.js 16 App Router (Views, API Routes, Layouts)
-│   ├── api/                   # HTTP API route endpoints (Auth Callback)
-│   ├── auth/                  # Pages for credential entry (Sign In, Sign Up, Error)
-│   ├── layout.tsx             # Root template loading fonts, navbar, and footer
-│   └── page.tsx               # Animated marketing landing page
-├── components/                # UI Presentation Layer
-│   ├── shared/                # App-wide shared elements (Navbar, Footer)
-│   └── ui/                    # Base design primitives (e.g. shadcn components)
-├── core/                      # Domain & Business Rules (Pure TypeScript, Zero external deps)
-│   ├── entities/              # Models representing application core structures
-│   │   ├── plan.ts            # LearningPlan schemas
-│   │   ├── progress.ts        # StudentProgress scores & goals
-│   │   ├── speech.ts          # SpeechAttempt metrics
-│   │   └── user.ts            # User profile data
-│   ├── repositories/          # Interface specifications for data access operations
-│   └── services/              # Interface specifications for third-party systems (AI, Auth)
-├── infrastructure/            # Adapter & Implementation Layer
-│   ├── database/              # Prisma concrete repository instances
-│   │   ├── prisma.ts          # Singleton Prisma Client constructor
-│   │   └── prisma-*-repository.ts # Implementations of core repositories
-│   └── services/              # External service adapters (OpenRouter integrations)
-├── lib/                       # Framework integrations and utilities
-│   ├── supabase/              # Supabase SSR cookie wrappers (client, server, middleware)
-│   └── utils.ts               # Tailored clsx & twMerge class utility
-├── proxy.ts                   # Next.js 16 Request Filter (Formerly Middleware)
-└── styles/                    # Styling definitions (globals.css Tailwind configuration)
-```
+To run the application, you need to set up the following environment variables in a `.env` file:
 
----
+```env
+# Database Configuration
+DATABASE_URL="postgresql://postgres:password@localhost:5432/sprinkles?schema=public"
+DIRECT_URL="postgresql://postgres:password@localhost:5432/sprinkles?schema=public"
 
-## ⚙️ Technology Stack
+# Supabase Auth Configuration
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 
-*   **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
-*   **Language**: [TypeScript](https://www.typescriptlang.org/)
-*   **Database ORM**: [Prisma ORM (v6)](https://www.prisma.io/)
-*   **Database Engine**: [PostgreSQL (Supabase)](https://supabase.com/)
-*   **Auth Management**: [Supabase Authentication (Google OAuth + Email)](https://supabase.com/docs/guides/auth)
-*   **AI Integration**: [OpenRouter API](https://openrouter.ai/) (Pre-wired for Gemini completions)
-*   **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
-*   **Animations**: [Framer Motion](https://www.framer.com/motion/)
-*   **Icons**: [Lucide React](https://lucide.dev/)
-
----
-
-## 🚀 Setup & Onboarding Guide
-
-Follow these steps to establish a fully compiled local environment:
-
-### 1. Clone the Project & Install Dependencies
-First, execute a dependency install:
-```bash
-npm install
+# AI Provider Keys
+OPENAI_API_KEY="sk-..."
 ```
 
-### 2. Configure Environment Variables
-Copy the environment variables template and configure the values:
-```bash
-cp .env.example .env
-```
-Fill in the respective credentials:
-*   `DATABASE_URL` / `DIRECT_URL`: Supabase Transaction Pooler and Direct migration strings.
-*   `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public client integration keys.
-*   `OPENROUTER_API_KEY`: API authorization key for LLM prompting.
+## Installation Guide
 
-### 3. Generate the Prisma Client
-Generate the TypeScript bindings for the client:
-```bash
-npx prisma generate
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/muthupandi-tech/Sprinkles.git
+   cd Sprinkles
+   ```
 
-### 4. Push Schema to Database (Optional)
-If your database schema needs to sync up with Supabase:
-```bash
-npx prisma db push
-```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### 5. Launch the Local Dev Server
-Fire up the local hot-reloader:
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) inside your web browser.
+3. **Set up the Database:**
+   Ensure PostgreSQL is running, then apply the Prisma migrations:
+   ```bash
+   npx prisma migrate dev --name init
+   ```
 
----
+4. **Seed the Database (Optional but recommended for demo):**
+   ```bash
+   npx prisma db seed
+   ```
 
-## 💅 Formatting & Style Enforcement
+5. **Run the Development Server:**
+   ```bash
+   npm run dev
+   ```
 
-Strict formatting guidelines are enforced via ESLint flat configs and Prettier rules to keep codebases uniform:
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-```bash
-# Analyze files for syntax warnings and formatting errors
-npm run lint
+## Deployment
 
-# Auto-correct formatting and stylistic inconsistencies
-npx eslint --fix
-```
+Sprinkles is optimized for deployment on Vercel:
 
-Rules include:
-*   Semicolons required, double-quotes preferred.
-*   Automated Tailwind class sorting via `prettier-plugin-tailwindcss`.
-*   Unused imports are prevented by default.
+1. Push your code to a GitHub repository.
+2. Go to [Vercel](https://vercel.com/) and import the repository.
+3. Configure the environment variables in the Vercel dashboard.
+4. Deploy! Vercel will automatically run `npm run build` and handle edge caching.
+
+**Note:** Remember to update the Supabase Auth Redirect URLs in your Supabase project settings to include your production Vercel URL.
+
+## License
+
+MIT License

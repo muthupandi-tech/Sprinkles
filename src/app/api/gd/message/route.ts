@@ -13,7 +13,10 @@ const openrouter = createOpenAI({
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -31,9 +34,9 @@ export async function POST(req: Request) {
       include: {
         participants: true,
         messages: {
-          orderBy: { createdAt: 'asc' }
-        }
-      }
+          orderBy: { createdAt: "asc" },
+        },
+      },
     });
 
     if (!session) {
@@ -41,15 +44,15 @@ export async function POST(req: Request) {
     }
 
     // Save user's message if provided
-    let newMessagesToReturn = [];
+    const newMessagesToReturn = [];
     if (transcript && transcript.trim().length > 0) {
       const userMessage = await prisma.gDMessage.create({
         data: {
           sessionId,
           speakerName: "You",
           speakerRole: "user",
-          content: transcript
-        }
+          content: transcript,
+        },
       });
       newMessagesToReturn.push(userMessage);
       // Temporarily append to session.messages for the LLM context
@@ -57,10 +60,10 @@ export async function POST(req: Request) {
     }
 
     // Prepare participants context
-    const participantContext = session.participants.map(p => `- ${p.name}: ${p.role}`).join("\n");
-    
+    const participantContext = session.participants.map((p) => `- ${p.name}: ${p.role}`).join("\n");
+
     // Prepare conversation history
-    const historyText = session.messages.map(m => `[${m.speakerName}]: ${m.content}`).join("\n");
+    const historyText = session.messages.map((m) => `[${m.speakerName}]: ${m.content}`).join("\n");
 
     const systemPrompt = `You are the Simulation Engine for an AI Group Discussion.
 Topic: "${session.topic}"
@@ -84,18 +87,25 @@ Output a JSON array of message objects.`;
       system: systemPrompt,
       prompt: `Current Transcript:\n${historyText}\n\nGenerate the next 1-2 messages.`,
       schema: z.object({
-        messages: z.array(z.object({
-          participantName: z.string().describe("Must exactly match one of the participant names: " + session.participants.map(p => p.name).join(", ")),
-          content: z.string().describe("What the participant says")
-        }))
-      })
+        messages: z.array(
+          z.object({
+            participantName: z
+              .string()
+              .describe(
+                "Must exactly match one of the participant names: " +
+                  session.participants.map((p) => p.name).join(", ")
+              ),
+            content: z.string().describe("What the participant says"),
+          })
+        ),
+      }),
     });
 
     const generatedMessages = result.object.messages;
 
     // Save generated messages to DB
     for (const gm of generatedMessages) {
-      const participant = session.participants.find(p => p.name === gm.participantName);
+      const participant = session.participants.find((p) => p.name === gm.participantName);
       if (participant) {
         const aiMessage = await prisma.gDMessage.create({
           data: {
@@ -103,8 +113,8 @@ Output a JSON array of message objects.`;
             participantId: participant.id,
             speakerName: participant.name,
             speakerRole: "ai",
-            content: gm.content
-          }
+            content: gm.content,
+          },
         });
         newMessagesToReturn.push(aiMessage);
       }
@@ -112,11 +122,13 @@ Output a JSON array of message objects.`;
 
     return NextResponse.json({
       success: true,
-      messages: newMessagesToReturn
+      messages: newMessagesToReturn,
     });
-
   } catch (error) {
     console.error("GD Message Error:", error);
-    return new NextResponse(JSON.stringify({ error: "Failed to generate AI response" }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify({ error: "Failed to generate AI response" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

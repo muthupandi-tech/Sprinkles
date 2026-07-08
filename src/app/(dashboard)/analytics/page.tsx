@@ -5,13 +5,15 @@ import { redirect } from "next/navigation";
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/auth/signin");
   }
 
   const data = await AnalyticsService.getDashboardAnalytics(user.id);
-  
+
   return <AnalyticsClient initialData={data} />;
 }

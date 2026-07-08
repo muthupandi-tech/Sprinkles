@@ -12,13 +12,16 @@ const openrouter = createOpenAI({
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const { company, interviewType, resumeContext } = await req.json() as {
+    const { company, interviewType, resumeContext } = (await req.json()) as {
       company: string;
       interviewType: string;
       resumeContext?: string;
@@ -36,15 +39,15 @@ export async function POST(req: Request) {
         interviewType,
         resumeContext,
         status: "in_progress",
-      }
+      },
     });
 
     // 2. Generate the first question using AI
     const profile = await prisma.studentProfile.findUnique({ where: { userId: user.id } });
-    
+
     const systemPrompt = `You are an expert ${interviewType} Interviewer for ${company}.
-    You are interviewing a candidate whose career goal is: ${profile?.careerGoal || 'Unknown'}.
-    ${resumeContext ? `Here is the candidate's resume/background context:\n${resumeContext}\n` : ''}
+    You are interviewing a candidate whose career goal is: ${profile?.careerGoal || "Unknown"}.
+    ${resumeContext ? `Here is the candidate's resume/background context:\n${resumeContext}\n` : ""}
     Generate the FIRST question you would ask them to start the interview.
     Keep it conversational, professional, and relevant to the company and role.`;
 
@@ -63,7 +66,7 @@ export async function POST(req: Request) {
         sessionId: session.id,
         questionText: result.object.questionText,
         order: 1,
-      }
+      },
     });
 
     return Response.json({ success: true, sessionId: session.id, firstQuestion: question });

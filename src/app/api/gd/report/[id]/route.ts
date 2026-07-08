@@ -13,7 +13,10 @@ const openrouter = createOpenAI({
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -25,9 +28,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       where: { id, userId: user.id },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' }
-        }
-      }
+          orderBy: { createdAt: "asc" },
+        },
+      },
     });
 
     if (!session) {
@@ -38,7 +41,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ success: true, session });
     }
 
-    const historyText = session.messages.map(m => `[${m.speakerName}]: ${m.content}`).join("\n");
+    const historyText = session.messages.map((m) => `[${m.speakerName}]: ${m.content}`).join("\n");
 
     const systemPrompt = `You are an expert Group Discussion Assessor.
 Analyze the following transcript of a Group Discussion on the topic: "${session.topic}".
@@ -57,19 +60,37 @@ Return a structured JSON evaluation.`;
         fluencyScore: z.number().min(0).max(100),
         grammarScore: z.number().min(0).max(100),
         vocabularyScore: z.number().min(0).max(100),
-        leadershipScore: z.number().min(0).max(100).describe("Score based on how they guided or influenced the group"),
+        leadershipScore: z
+          .number()
+          .min(0)
+          .max(100)
+          .describe("Score based on how they guided or influenced the group"),
         criticalThinkingScore: z.number().min(0).max(100),
-        listeningSkillsScore: z.number().min(0).max(100).describe("Based on whether they acknowledged points made by others"),
+        listeningSkillsScore: z
+          .number()
+          .min(0)
+          .max(100)
+          .describe("Based on whether they acknowledged points made by others"),
         strengths: z.array(z.string()).describe("2-3 strengths"),
         weaknesses: z.array(z.string()).describe("2-3 areas for improvement"),
-        missedOpportunities: z.array(z.string()).describe("Points where they could have jumped in but didn't, or points they failed to address"),
-        betterResponses: z.array(z.object({
-          originalContext: z.string(),
-          whatTheySaid: z.string(),
-          betterAlternative: z.string(),
-          reason: z.string()
-        })).describe("1-2 examples of how they could have responded better to specific situations in the GD")
-      })
+        missedOpportunities: z
+          .array(z.string())
+          .describe(
+            "Points where they could have jumped in but didn't, or points they failed to address"
+          ),
+        betterResponses: z
+          .array(
+            z.object({
+              originalContext: z.string(),
+              whatTheySaid: z.string(),
+              betterAlternative: z.string(),
+              reason: z.string(),
+            })
+          )
+          .describe(
+            "1-2 examples of how they could have responded better to specific situations in the GD"
+          ),
+      }),
     });
 
     const feedback = result.object;
@@ -80,30 +101,35 @@ Return a structured JSON evaluation.`;
       data: {
         status: "completed",
         overallScore: feedback.overallScore,
-        feedbackJson: feedback as any
-      }
+        feedbackJson: feedback as any,
+      },
     });
 
     // Update Progress globally
     const progress = await prisma.progress.findUnique({ where: { userId: user.id } });
     if (progress) {
-      const newGdScore = progress.gdScore === 0 ? feedback.overallScore : (progress.gdScore + feedback.overallScore) / 2;
+      const newGdScore =
+        progress.gdScore === 0
+          ? feedback.overallScore
+          : (progress.gdScore + feedback.overallScore) / 2;
       const newOverall = (progress.overallScore + newGdScore) / 2;
-      
+
       await prisma.progress.update({
         where: { userId: user.id },
         data: {
           gdScore: newGdScore,
           overallScore: newOverall,
-          totalPracticeTime: progress.totalPracticeTime + 5 // assume 5 mins per GD roughly
-        }
+          totalPracticeTime: progress.totalPracticeTime + 5, // assume 5 mins per GD roughly
+        },
       });
     }
 
     return NextResponse.json({ success: true, session: updatedSession });
-
   } catch (error) {
     console.error("GD Report Error:", error);
-    return new NextResponse(JSON.stringify({ error: "Failed to generate report" }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new NextResponse(JSON.stringify({ error: "Failed to generate report" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

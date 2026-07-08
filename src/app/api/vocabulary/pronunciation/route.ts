@@ -12,13 +12,20 @@ const openrouter = createOpenAI({
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const { transcript, targetWord, wordId } = await req.json() as { transcript: string; targetWord: string; wordId: string };
+    const { transcript, targetWord, wordId } = (await req.json()) as {
+      transcript: string;
+      targetWord: string;
+      wordId: string;
+    };
 
     if (!transcript || !targetWord) {
       return new Response("Transcript and Target Word are required", { status: 400 });
@@ -36,20 +43,24 @@ export async function POST(req: Request) {
       prompt: "Analyze the pronunciation.",
       schema: z.object({
         score: z.number().min(0).max(100).describe("Pronunciation accuracy score"),
-        feedback: z.string().describe("Constructive feedback on what was mispronounced, or encouragement if perfect"),
-        mispronouncedSyllables: z.array(z.string()).describe("List of syllables or sounds they struggled with"),
+        feedback: z
+          .string()
+          .describe("Constructive feedback on what was mispronounced, or encouragement if perfect"),
+        mispronouncedSyllables: z
+          .array(z.string())
+          .describe("List of syllables or sounds they struggled with"),
       }),
     });
 
     // Optionally update mastery level based on score
     if (wordId && result.object.score > 80) {
       const userVocab = await prisma.userVocabulary.findUnique({
-        where: { userId_wordId: { userId: user.id, wordId } }
+        where: { userId_wordId: { userId: user.id, wordId } },
       });
       if (userVocab && userVocab.masteryLevel < 5) {
         await prisma.userVocabulary.update({
           where: { id: userVocab.id },
-          data: { masteryLevel: userVocab.masteryLevel + 1 }
+          data: { masteryLevel: userVocab.masteryLevel + 1 },
         });
       }
     }

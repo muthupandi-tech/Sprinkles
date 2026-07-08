@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { getStudentProfile, saveStudentProfile, ProfileData } from "@/app/actions/profile";
+import { toast } from "sonner";
 
 export default function StudentProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -69,14 +70,17 @@ export default function StudentProfilePage() {
         const res = await saveStudentProfile(profile);
         if (res.success) {
           setSuccess("Profile settings updated successfully!");
+          toast.success("Profile settings updated successfully!");
           // Auto clear success indicator after 3 seconds
           setTimeout(() => setSuccess(null), 3000);
         } else {
           setError(res.error || "Failed to save profile changes.");
+          toast.error(res.error || "Failed to save profile changes.");
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : "An unexpected error occurred.";
         setError(message);
+        toast.error(message);
       }
     });
   };

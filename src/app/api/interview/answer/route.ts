@@ -12,13 +12,16 @@ const openrouter = createOpenAI({
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const { sessionId, questionId, studentAnswer, currentOrder } = await req.json() as {
+    const { sessionId, questionId, studentAnswer, currentOrder } = (await req.json()) as {
       sessionId: string;
       questionId: string;
       studentAnswer: string;
@@ -35,24 +38,26 @@ export async function POST(req: Request) {
       include: {
         questions: {
           include: { answer: true },
-          orderBy: { order: "asc" }
-        }
-      }
+          orderBy: { order: "asc" },
+        },
+      },
     });
 
     if (!session || session.userId !== user.id) {
       return new Response("Session not found", { status: 404 });
     }
 
-    const currentQuestion = session.questions.find(q => q.id === questionId);
+    const currentQuestion = session.questions.find((q) => q.id === questionId);
     if (!currentQuestion) return new Response("Question not found", { status: 404 });
 
     // Build chat history for AI Context
-    const conversationHistory = session.questions.map(q => {
-      let turn = `AI Interviewer: ${q.questionText}`;
-      if (q.answer) turn += `\nStudent: ${q.answer.studentAnswer}`;
-      return turn;
-    }).join("\n\n");
+    const conversationHistory = session.questions
+      .map((q) => {
+        let turn = `AI Interviewer: ${q.questionText}`;
+        if (q.answer) turn += `\nStudent: ${q.answer.studentAnswer}`;
+        return turn;
+      })
+      .join("\n\n");
 
     const systemPrompt = `You are an expert ${session.interviewType} Interviewer for ${session.company}.
     The candidate just answered your question. 
@@ -81,7 +86,9 @@ export async function POST(req: Request) {
           betterSampleAnswer: z.string().describe("How a professional would have answered"),
         }),
         nextQuestion: z.string().optional().describe("The next question to ask, if not complete"),
-        isComplete: z.boolean().describe("True if the interview has reached 5 questions and should conclude"),
+        isComplete: z
+          .boolean()
+          .describe("True if the interview has reached 5 questions and should conclude"),
       }),
     });
 
@@ -97,15 +104,15 @@ export async function POST(req: Request) {
         feedbackJson: {
           feedback: result.object.evaluation.feedback,
           betterSampleAnswer: result.object.evaluation.betterSampleAnswer,
-        }
-      }
+        },
+      },
     });
 
     // 3. Generate Next Question OR Complete Session
     if (result.object.isComplete || currentOrder >= 5) {
       await prisma.interviewSession.update({
         where: { id: sessionId },
-        data: { status: "completed" }
+        data: { status: "completed" },
       });
       return Response.json({ success: true, isComplete: true, evaluation: answer });
     } else {
@@ -113,12 +120,11 @@ export async function POST(req: Request) {
         data: {
           sessionId,
           questionText: result.object.nextQuestion || "Can you elaborate on that?",
-          order: currentOrder + 1
-        }
+          order: currentOrder + 1,
+        },
       });
       return Response.json({ success: true, isComplete: false, evaluation: answer, nextQuestion });
     }
-
   } catch (err) {
     console.error("Interview Answer Error:", err);
     return new Response("Internal Server Error", { status: 500 });

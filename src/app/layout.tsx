@@ -1,5 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Sprinkles | AI Personal Communication & Spoken English Coach",
@@ -29,8 +31,19 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning className="bg-background-app flex min-h-full flex-col text-gray-900 font-sans">
-        <main className="flex flex-grow flex-col">{children}</main>
+      <body
+        suppressHydrationWarning
+        className="bg-background-app flex min-h-full flex-col font-sans text-gray-900"
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className="flex flex-grow flex-col">{children}</main>
+          <Toaster position="top-right" />
+        </ThemeProvider>
       </body>
     </html>
   );

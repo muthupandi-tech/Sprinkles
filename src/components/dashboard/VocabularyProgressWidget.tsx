@@ -16,7 +16,7 @@ export function VocabularyProgressWidget() {
           const vocab = json.data as any[];
           setStats({
             wordsLearned: vocab.length,
-            mastered: vocab.filter(v => v.masteryLevel === 5).length
+            mastered: vocab.filter((v) => v.masteryLevel === 5).length,
           });
         }
       } catch (err) {
@@ -38,26 +38,30 @@ export function VocabularyProgressWidget() {
 
   return (
     <div className="rounded-2xl border border-green-100 bg-gradient-to-br from-green-50 to-emerald-50 p-6 shadow-sm">
-      <div className="flex items-center gap-3 mb-4">
+      <div className="mb-4 flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-100 text-green-600">
           <BookOpen className="h-5 w-5" />
         </div>
         <h3 className="text-lg font-bold text-green-900">Vocabulary Progress</h3>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl bg-white p-4 shadow-sm border border-green-100">
-          <div className="flex items-center gap-2 mb-1">
+        <div className="rounded-xl border border-green-100 bg-white p-4 shadow-sm">
+          <div className="mb-1 flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-green-500" />
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Learned</span>
+            <span className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+              Learned
+            </span>
           </div>
           <p className="text-2xl font-extrabold text-gray-900">{stats.wordsLearned}</p>
         </div>
-        
-        <div className="rounded-xl bg-white p-4 shadow-sm border border-green-100">
-          <div className="flex items-center gap-2 mb-1">
+
+        <div className="rounded-xl border border-green-100 bg-white p-4 shadow-sm">
+          <div className="mb-1 flex items-center gap-2">
             <Award className="h-4 w-4 text-yellow-500" />
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Mastered</span>
+            <span className="text-xs font-bold tracking-wider text-gray-500 uppercase">
+              Mastered
+            </span>
           </div>
           <p className="text-2xl font-extrabold text-gray-900">{stats.mastered}</p>
         </div>

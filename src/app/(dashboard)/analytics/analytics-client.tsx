@@ -57,13 +57,16 @@ export default function AnalyticsClient({ initialData }: AnalyticsClientProps) {
   };
 
   // Mock data for cases where history is empty to show the charts properly in demo
-  const history = analyticsHistory.length > 0 ? analyticsHistory : [
-    { date: "2024-01-01", speakingScore: 60, vocabularyScore: 50, practiceTime: 10 },
-    { date: "2024-01-02", speakingScore: 65, vocabularyScore: 55, practiceTime: 15 },
-    { date: "2024-01-03", speakingScore: 62, vocabularyScore: 58, practiceTime: 20 },
-    { date: "2024-01-04", speakingScore: 70, vocabularyScore: 65, practiceTime: 25 },
-    { date: "2024-01-05", speakingScore: 75, vocabularyScore: 70, practiceTime: 30 },
-  ];
+  const history =
+    analyticsHistory.length > 0
+      ? analyticsHistory
+      : [
+          { date: "2024-01-01", speakingScore: 60, vocabularyScore: 50, practiceTime: 10 },
+          { date: "2024-01-02", speakingScore: 65, vocabularyScore: 55, practiceTime: 15 },
+          { date: "2024-01-03", speakingScore: 62, vocabularyScore: 58, practiceTime: 20 },
+          { date: "2024-01-04", speakingScore: 70, vocabularyScore: 65, practiceTime: 25 },
+          { date: "2024-01-05", speakingScore: 75, vocabularyScore: 70, practiceTime: 30 },
+        ];
 
   const chartData = history.map((item) => ({
     ...item,
@@ -121,29 +124,36 @@ export default function AnalyticsClient({ initialData }: AnalyticsClientProps) {
       {/* Widgets */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
         <div className="col-span-2 rounded-xl border border-gray-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase text-blue-800">Overall Score</p>
+          <p className="text-xs font-semibold text-blue-800 uppercase">Overall Score</p>
           <h3 className="mt-1 text-3xl font-extrabold text-blue-900">
             {defaultProgress.overallScore.toFixed(0)}
             <span className="text-lg text-blue-600">/100</span>
           </h3>
         </div>
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase text-gray-400">Practice Time</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase">Practice Time</p>
           <h3 className="mt-1 text-xl font-extrabold text-gray-900">
-            {defaultProgress.totalPracticeTime} <span className="text-sm font-normal text-gray-500">mins</span>
+            {defaultProgress.totalPracticeTime}{" "}
+            <span className="text-sm font-normal text-gray-500">mins</span>
           </h3>
         </div>
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase text-gray-400">Speaking</p>
-          <h3 className="mt-1 text-xl font-extrabold text-gray-900">{defaultProgress.speakingScore.toFixed(0)}%</h3>
+          <p className="text-xs font-semibold text-gray-400 uppercase">Speaking</p>
+          <h3 className="mt-1 text-xl font-extrabold text-gray-900">
+            {defaultProgress.speakingScore.toFixed(0)}%
+          </h3>
         </div>
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase text-gray-400">Vocabulary</p>
-          <h3 className="mt-1 text-xl font-extrabold text-gray-900">{defaultProgress.vocabularyScore.toFixed(0)}%</h3>
+          <p className="text-xs font-semibold text-gray-400 uppercase">Vocabulary</p>
+          <h3 className="mt-1 text-xl font-extrabold text-gray-900">
+            {defaultProgress.vocabularyScore.toFixed(0)}%
+          </h3>
         </div>
         <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase text-gray-400">Interview</p>
-          <h3 className="mt-1 text-xl font-extrabold text-gray-900">{defaultProgress.interviewScore.toFixed(0)}%</h3>
+          <p className="text-xs font-semibold text-gray-400 uppercase">Interview</p>
+          <h3 className="mt-1 text-xl font-extrabold text-gray-900">
+            {defaultProgress.interviewScore.toFixed(0)}%
+          </h3>
         </div>
       </div>
 
@@ -176,13 +186,36 @@ export default function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 10, fill: "#9ca3af" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 10, fill: "#9ca3af" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <Tooltip contentStyle={{ fontSize: 11, borderRadius: 10 }} />
                     <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
-                    <Area type="monotone" dataKey="speakingScore" name="Speaking" stroke="#2563eb" fillOpacity={1} fill="url(#colorSpeaking)" />
-                    <Area type="monotone" dataKey="vocabularyScore" name="Vocabulary" stroke="#10b981" fillOpacity={1} fill="url(#colorVocab)" />
+                    <Area
+                      type="monotone"
+                      dataKey="speakingScore"
+                      name="Speaking"
+                      stroke="#2563eb"
+                      fillOpacity={1}
+                      fill="url(#colorSpeaking)"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="vocabularyScore"
+                      name="Vocabulary"
+                      stroke="#10b981"
+                      fillOpacity={1}
+                      fill="url(#colorVocab)"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
@@ -206,10 +239,24 @@ export default function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} margin={{ top: 10, right: 5, left: -20, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 10, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 10, fill: "#9ca3af" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
                       <Tooltip contentStyle={{ fontSize: 11, borderRadius: 10 }} />
-                      <Bar dataKey="practiceTime" name="Minutes" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                      <Bar
+                        dataKey="practiceTime"
+                        name="Minutes"
+                        fill="#f59e0b"
+                        radius={[4, 4, 0, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -271,13 +318,13 @@ export default function AnalyticsClient({ initialData }: AnalyticsClientProps) {
                 Refresh
               </button>
             </div>
-            
+
             <div className="space-y-3">
               {recommendations.length > 0 ? (
                 recommendations.map((rec) => (
                   <div key={rec.id} className="flex items-start gap-3 rounded-xl bg-blue-50/50 p-3">
                     <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
-                    <p className="text-sm text-gray-700 leading-snug">{rec.content}</p>
+                    <p className="text-sm leading-snug text-gray-700">{rec.content}</p>
                   </div>
                 ))
               ) : (

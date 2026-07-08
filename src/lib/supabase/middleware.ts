@@ -21,9 +21,7 @@ export async function updateSession(request: NextRequest) {
           try {
             cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
             supabaseResponse = NextResponse.next({
-              request: {
-                headers: request.headers,
-              },
+              request,
             });
             cookiesToSet.forEach(({ name, value, options }) =>
               supabaseResponse.cookies.set(name, value, options)
@@ -35,8 +33,8 @@ export async function updateSession(request: NextRequest) {
       },
     });
 
-    // This will refresh session if expired
-    await supabase.auth.getUser();
+    // Use getSession to avoid Edge runtime network timeouts on Windows local dev
+    await supabase.auth.getSession();
   } catch (error) {
     // Fail silently or log error for unauthenticated requests/placeholder configurations
     console.warn("Supabase session refresh failed:", error);

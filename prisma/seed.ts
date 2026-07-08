@@ -184,8 +184,8 @@ async function main() {
           feedbackJson: {
             strengths: ["Excellent technical clarifications", "Good coding layout discussions"],
             weaknesses: ["Work on structuring behavioral queries using the STAR method"],
-            tips: ["Practice more behavioral questions"]
-          }
+            tips: ["Practice more behavioral questions"],
+          },
         },
       });
     }
@@ -235,6 +235,84 @@ async function main() {
             message:
               "You have 4 new daily missions waiting for you on your dashboard. Complete them to earn score boosts.",
             read: false,
+          },
+        ],
+      });
+    }
+
+    // 9. Create Analytics if not present
+    const analyticsCount = await prisma.analytics.count({ where: { userId: user.id } });
+    if (analyticsCount === 0) {
+      const today = new Date();
+      await prisma.analytics.createMany({
+        data: [
+          {
+            userId: user.id,
+            date: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000),
+            practiceTime: 15,
+            speakingScore: 72,
+            vocabularyScore: 78,
+          },
+          {
+            userId: user.id,
+            date: new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000),
+            practiceTime: 20,
+            speakingScore: 75,
+            vocabularyScore: 80,
+          },
+          {
+            userId: user.id,
+            date: today,
+            practiceTime: 30,
+            speakingScore: 78,
+            vocabularyScore: 85,
+          },
+        ],
+      });
+    }
+
+    // 10. Create Chat History if not present
+    const convoCount = await prisma.conversation.count({ where: { userId: user.id } });
+    if (convoCount === 0) {
+      const convo = await prisma.conversation.create({
+        data: {
+          userId: user.id,
+          title: "General English Practice",
+        },
+      });
+      await prisma.message.createMany({
+        data: [
+          {
+            conversationId: convo.id,
+            userId: user.id,
+            role: "system",
+            content: "You are Sprinkles, an AI English Coach.",
+          },
+          {
+            conversationId: convo.id,
+            userId: user.id,
+            role: "user",
+            content: "Hi, I want to practice introducing myself.",
+          },
+          {
+            conversationId: convo.id,
+            userId: user.id,
+            role: "assistant",
+            content:
+              "Hello! That's a great idea. Why don't you start by telling me a little bit about your background and what you are currently studying?",
+          },
+          {
+            conversationId: convo.id,
+            userId: user.id,
+            role: "user",
+            content: "I am a 3rd year computer science student. I like coding.",
+          },
+          {
+            conversationId: convo.id,
+            userId: user.id,
+            role: "assistant",
+            content:
+              "That's a good start! To make it sound more professional, you could say: 'I'm currently in my third year of pursuing a degree in Computer Science, and I have a strong passion for software development.' Try saying that!",
           },
         ],
       });

@@ -4,7 +4,10 @@ import { prisma } from "@/infrastructure/database/prisma";
 export async function GET(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -12,7 +15,7 @@ export async function GET(req: Request) {
 
     const reminders = await prisma.reminder.findMany({
       where: { userId: user.id },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     return Response.json({ success: true, reminders });
@@ -25,7 +28,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -40,8 +46,8 @@ export async function POST(req: Request) {
         type,
         time,
         enabled,
-        days
-      }
+        days,
+      },
     });
 
     return Response.json({ success: true, reminder: newReminder });
@@ -54,7 +60,10 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -64,7 +73,7 @@ export async function PATCH(req: Request) {
 
     const updatedReminder = await prisma.reminder.update({
       where: { id, userId: user.id },
-      data: { enabled, time, days }
+      data: { enabled, time, days },
     });
 
     return Response.json({ success: true, reminder: updatedReminder });
@@ -77,7 +86,10 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -89,7 +101,7 @@ export async function DELETE(req: Request) {
     if (!id) return new Response("Missing id", { status: 400 });
 
     await prisma.reminder.delete({
-      where: { id, userId: user.id }
+      where: { id, userId: user.id },
     });
 
     return Response.json({ success: true });

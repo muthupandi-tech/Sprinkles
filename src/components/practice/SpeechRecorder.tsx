@@ -14,7 +14,7 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
   const [timer, setTimer] = useState(0);
   const [transcript, setTranscript] = useState("");
   const [hasFinished, setHasFinished] = useState(false);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<any>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -23,7 +23,8 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
 
   useEffect(() => {
     // Initialize Web Speech API
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
@@ -41,7 +42,7 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
             interimTranscript += event.results[i][0].transcript;
           }
         }
-        
+
         if (finalTranscript) {
           setTranscript((prev) => (prev + " " + finalTranscript).trim());
         }
@@ -67,7 +68,7 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -89,17 +90,16 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
         setTranscript(""); // clear previous
         recognitionRef.current.start();
       }
-      
+
       setIsRecording(true);
       setIsPaused(false);
       setHasFinished(false);
       setTimer(0);
       setAudioUrl(null);
-      
+
       timerIntervalRef.current = setInterval(() => {
         setTimer((prev) => prev + 1);
       }, 1000);
-      
     } catch (error) {
       console.error("Error accessing microphone", error);
       alert("Microphone access is required for speech practice.");
@@ -109,7 +109,7 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
   const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
     }
     if (recognitionRef.current) {
       recognitionRef.current.stop();
@@ -154,13 +154,21 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
             {isRecording && !isPaused && (
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
             )}
-            <span className={`relative inline-flex h-3 w-3 rounded-full ${isRecording && !isPaused ? 'bg-red-500' : 'bg-gray-300'}`}></span>
+            <span
+              className={`relative inline-flex h-3 w-3 rounded-full ${isRecording && !isPaused ? "bg-red-500" : "bg-gray-300"}`}
+            ></span>
           </div>
           <span className="text-sm font-medium text-gray-700">
-            {isRecording && !isPaused ? "Recording..." : isPaused ? "Paused" : hasFinished ? "Recording Complete" : "Ready to Record"}
+            {isRecording && !isPaused
+              ? "Recording..."
+              : isPaused
+                ? "Paused"
+                : hasFinished
+                  ? "Recording Complete"
+                  : "Ready to Record"}
           </span>
         </div>
-        <div className="text-2xl font-mono font-semibold text-gray-900 tracking-wider">
+        <div className="font-mono text-2xl font-semibold tracking-wider text-gray-900">
           {formatTime(timer)}
         </div>
       </div>
@@ -173,7 +181,7 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
             className="group relative flex h-20 w-20 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-200 transition-all hover:scale-105 hover:bg-blue-700"
           >
             <Mic className="h-8 w-8 transition-transform group-hover:scale-110" />
-            <div className="absolute -bottom-8 whitespace-nowrap text-xs font-bold text-gray-500">
+            <div className="absolute -bottom-8 text-xs font-bold whitespace-nowrap text-gray-500">
               Click to Start
             </div>
           </button>
@@ -192,10 +200,8 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
 
         {hasFinished && (
           <div className="flex w-full flex-col items-center gap-6">
-            {audioUrl && (
-              <audio controls src={audioUrl} className="w-full max-w-md" />
-            )}
-            
+            {audioUrl && <audio controls src={audioUrl} className="w-full max-w-md" />}
+
             <div className="flex items-center gap-4">
               <button
                 onClick={handleReset}
@@ -229,18 +235,19 @@ export function SpeechRecorder({ onAnalyze, isAnalyzing }: SpeechRecorderProps) 
 
       {/* Transcript Textarea */}
       <div className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+        <label className="text-xs font-bold tracking-wider text-gray-500 uppercase">
           Live Transcript (Editable)
         </label>
         <textarea
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
           placeholder="Your speech will appear here... You can edit this text before submitting for analysis if the AI misheard you."
-          className="h-40 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 disabled:opacity-50"
+          className="h-40 w-full resize-none rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:outline-none disabled:opacity-50"
           disabled={isRecording || isAnalyzing}
         />
         <p className="text-xs text-gray-400">
-          *Note: Transcription requires a supported browser (Chrome, Edge). If it fails, you can type your speech manually.
+          *Note: Transcription requires a supported browser (Chrome, Edge). If it fails, you can
+          type your speech manually.
         </p>
       </div>
     </div>

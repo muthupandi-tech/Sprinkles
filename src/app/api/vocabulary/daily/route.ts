@@ -12,7 +12,10 @@ const openrouter = createOpenAI({
 export async function GET(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -39,7 +42,7 @@ export async function GET(req: Request) {
     });
 
     if (todaysVocab.length >= 5) {
-      return Response.json({ success: true, data: todaysVocab.map(v => v.word) });
+      return Response.json({ success: true, data: todaysVocab.map((v) => v.word) });
     }
 
     // 3. Need to generate new words
@@ -63,16 +66,22 @@ export async function GET(req: Request) {
       system: systemPrompt,
       prompt: "Generate the daily vocabulary words.",
       schema: z.object({
-        words: z.array(z.object({
-          word: z.string(),
-          meaning: z.string(),
-          pronunciation: z.string(),
-          partOfSpeech: z.string(),
-          synonyms: z.array(z.string()),
-          antonyms: z.array(z.string()),
-          exampleSentence: z.string(),
-          interviewExample: z.string().describe("An example sentence of how to use this word in a job interview"),
-        })).length(neededCount),
+        words: z
+          .array(
+            z.object({
+              word: z.string(),
+              meaning: z.string(),
+              pronunciation: z.string(),
+              partOfSpeech: z.string(),
+              synonyms: z.array(z.string()),
+              antonyms: z.array(z.string()),
+              exampleSentence: z.string(),
+              interviewExample: z
+                .string()
+                .describe("An example sentence of how to use this word in a job interview"),
+            })
+          )
+          .length(neededCount),
       }),
     });
 
@@ -123,8 +132,7 @@ export async function GET(req: Request) {
       include: { word: true },
     });
 
-    return Response.json({ success: true, data: todaysVocab.map(v => v.word) });
-
+    return Response.json({ success: true, data: todaysVocab.map((v) => v.word) });
   } catch (error) {
     console.error("Daily Vocabulary Error:", error);
     return new Response("Internal Server Error", { status: 500 });

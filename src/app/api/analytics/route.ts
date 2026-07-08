@@ -17,10 +17,7 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching analytics:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch analytics" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch analytics" }, { status: 500 });
   }
 }
 
@@ -45,9 +42,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error performing analytics action:", error);
-    return NextResponse.json(
-      { error: "Failed to perform analytics action" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to perform analytics action" }, { status: 500 });
   }
 }

@@ -15,7 +15,10 @@ export async function POST(
 ) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -42,7 +45,9 @@ export async function POST(
     }
 
     // Format chat history
-    const chatHistory = conversation.messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join("\n\n");
+    const chatHistory = conversation.messages
+      .map((m) => `${m.role.toUpperCase()}: ${m.content}`)
+      .join("\n\n");
 
     const { object } = await generateObject({
       model: openrouter("openai/gpt-4o-mini"),
@@ -55,30 +60,34 @@ Based on the provided conversation history between the user and the coach, provi
       prompt: `Conversation History:\n${chatHistory}`,
       schema: z.object({
         vocabulary: z.string().describe("A vocabulary word to learn, with its definition."),
-        grammar: z.string().describe("A specific grammar correction pointing out a mistake and showing the correct way."),
+        grammar: z
+          .string()
+          .describe(
+            "A specific grammar correction pointing out a mistake and showing the correct way."
+          ),
         tip: z.string().describe("A short communication tip."),
-        challenge: z.string().describe("A daily speaking or communication challenge for the user.")
-      })
+        challenge: z.string().describe("A daily speaking or communication challenge for the user."),
+      }),
     });
 
     const suggestionsToCreate = [
       { type: "vocabulary", content: object.vocabulary },
       { type: "grammar", content: object.grammar },
       { type: "tip", content: object.tip },
-      { type: "challenge", content: object.challenge }
-    ].map(s => ({
+      { type: "challenge", content: object.challenge },
+    ].map((s) => ({
       userId: user.id,
       conversationId: conversation.id,
       type: s.type,
-      content: s.content
+      content: s.content,
     }));
 
     await prisma.coachSuggestion.createMany({
-      data: suggestionsToCreate
+      data: suggestionsToCreate,
     });
 
     const createdSuggestions = await prisma.coachSuggestion.findMany({
-      where: { conversationId: conversation.id }
+      where: { conversationId: conversation.id },
     });
 
     return Response.json({ success: true, suggestions: createdSuggestions });

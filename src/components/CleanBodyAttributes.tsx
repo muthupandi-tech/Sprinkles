@@ -15,7 +15,10 @@ export default function CleanBodyAttributes() {
     const observer = new MutationObserver(() => {
       cleanup();
     });
-    observer.observe(document.body, { attributes: true, attributeFilter: ["data-new-gr-c-s-check-loaded", "data-gr-ext-installed"] });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["data-new-gr-c-s-check-loaded", "data-gr-ext-installed"],
+    });
     return () => observer.disconnect();
   }, []);
 

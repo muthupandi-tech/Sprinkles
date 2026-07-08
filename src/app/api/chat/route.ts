@@ -18,39 +18,48 @@ Your personality is friendly, motivating, professional, patient, and career-focu
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
     const profile = await prisma.studentProfile.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     const dynamicSystemPrompt = `${systemPrompt}\n\nUser Context:\n- Name: ${profile?.fullName || "Student"}\n- English Level: ${profile?.englishProficiency || "Beginner"}\n- Preferred Accent: ${profile?.preferredAccent || "American"}\n- Target Career/Company: ${profile?.careerGoal || "Not specified"} at ${profile?.targetCompany || "Not specified"}`;
 
-    const { messages, conversationId } = await req.json() as { messages: { role: string, content: string }[], conversationId?: string };
+    const { messages, conversationId } = (await req.json()) as {
+      messages: { role: string; content: string }[];
+      conversationId?: string;
+    };
 
     let currentConversationId = conversationId;
 
     // Create a conversation if this is a new one
     if (!currentConversationId) {
-      const firstMessageContent = messages.find(m => m.role === "user")?.content || "New Chat";
-      const title = firstMessageContent.length > 30 ? firstMessageContent.substring(0, 30) + "..." : firstMessageContent;
-      
+      const firstMessageContent = messages.find((m) => m.role === "user")?.content || "New Chat";
+      const title =
+        firstMessageContent.length > 30
+          ? firstMessageContent.substring(0, 30) + "..."
+          : firstMessageContent;
+
       const newConversation = await prisma.conversation.create({
         data: {
           userId: user.id,
           title: title,
-        }
+        },
       });
       currentConversationId = newConversation.id;
     }
 
     // Identify the latest user message
     const latestMessage = messages[messages.length - 1];
-    
+
     // Save user message
     if (latestMessage.role === "user") {
       await prisma.message.create({
@@ -58,8 +67,8 @@ export async function POST(req: Request) {
           conversationId: currentConversationId,
           userId: user.id,
           role: "user",
-          content: latestMessage.content
-        }
+          content: latestMessage.content,
+        },
       });
     }
 
@@ -73,16 +82,16 @@ export async function POST(req: Request) {
             conversationId: currentConversationId!,
             userId: user.id,
             role: "assistant",
-            content: text
-          }
+            content: text,
+          },
         });
       },
     });
 
     return result.toTextStreamResponse({
-        headers: {
-            "x-conversation-id": currentConversationId!
-        }
+      headers: {
+        "x-conversation-id": currentConversationId!,
+      },
     });
   } catch (error) {
     console.error("Chat Error:", error);

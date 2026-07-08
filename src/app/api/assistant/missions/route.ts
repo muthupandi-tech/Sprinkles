@@ -12,7 +12,10 @@ const openrouter = createOpenAI({
 export async function GET(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -21,7 +24,7 @@ export async function GET(req: Request) {
     const missions = await prisma.dailyMission.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
-      take: 5
+      take: 5,
     });
 
     return Response.json({ success: true, missions });
@@ -34,18 +37,21 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
     const profile = await prisma.studentProfile.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     const progress = await prisma.progress.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     const { object } = await generateObject({
@@ -59,23 +65,27 @@ User Info:
 Provide 3 to 4 specific, actionable daily missions. Keep descriptions short.`,
       prompt: "Generate today's missions.",
       schema: z.object({
-        missions: z.array(z.object({
-          title: z.string(),
-          description: z.string(),
-          type: z.enum(["vocabulary", "speaking", "pronunciation", "interview", "general"]),
-          points: z.number().describe("Points awarded for completing, e.g., 10, 20")
-        })).length(4)
-      })
+        missions: z
+          .array(
+            z.object({
+              title: z.string(),
+              description: z.string(),
+              type: z.enum(["vocabulary", "speaking", "pronunciation", "interview", "general"]),
+              points: z.number().describe("Points awarded for completing, e.g., 10, 20"),
+            })
+          )
+          .length(4),
+      }),
     });
 
-    // Mark previous missions as complete/archived if needed, or just clear them. 
+    // Mark previous missions as complete/archived if needed, or just clear them.
     // Here we'll just delete old uncompleted missions to keep it clean.
     await prisma.dailyMission.deleteMany({
-      where: { userId: user.id, completed: false }
+      where: { userId: user.id, completed: false },
     });
 
     const newMissions = await Promise.all(
-      object.missions.map(m => 
+      object.missions.map((m) =>
         prisma.dailyMission.create({
           data: {
             userId: user.id,
@@ -83,8 +93,8 @@ Provide 3 to 4 specific, actionable daily missions. Keep descriptions short.`,
             description: m.description,
             type: m.type,
             points: m.points,
-            completed: false
-          }
+            completed: false,
+          },
         })
       )
     );
@@ -99,7 +109,10 @@ Provide 3 to 4 specific, actionable daily missions. Keep descriptions short.`,
 export async function PATCH(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -109,7 +122,7 @@ export async function PATCH(req: Request) {
 
     const updatedMission = await prisma.dailyMission.update({
       where: { id: missionId },
-      data: { completed }
+      data: { completed },
     });
 
     return Response.json({ success: true, mission: updatedMission });

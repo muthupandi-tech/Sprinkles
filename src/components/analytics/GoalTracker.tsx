@@ -37,7 +37,7 @@ export default function GoalTracker({ initialGoals }: GoalTrackerProps) {
           target: parseInt(newTarget, 10),
         }),
       });
-      
+
       if (res.ok) {
         const { goal } = await res.json();
         setGoals([goal, ...goals]);
@@ -57,10 +57,7 @@ export default function GoalTracker({ initialGoals }: GoalTrackerProps) {
           <Target className="h-4.5 w-4.5 text-blue-600" />
           <span>Goal Tracking</span>
         </h3>
-        <button
-          onClick={() => setIsAdding(!isAdding)}
-          className="rounded-md p-1 hover:bg-gray-100"
-        >
+        <button onClick={() => setIsAdding(!isAdding)} className="rounded-md p-1 hover:bg-gray-100">
           {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
         </button>
       </div>
@@ -121,7 +118,9 @@ export default function GoalTracker({ initialGoals }: GoalTrackerProps) {
                   ) : (
                     <Circle className="h-4 w-4 text-gray-300" />
                   )}
-                  <span className={`text-sm ${goal.completed ? "text-gray-500 line-through" : "text-gray-700 font-medium"}`}>
+                  <span
+                    className={`text-sm ${goal.completed ? "text-gray-500 line-through" : "font-medium text-gray-700"}`}
+                  >
                     {goal.title}
                   </span>
                 </div>
@@ -137,7 +136,9 @@ export default function GoalTracker({ initialGoals }: GoalTrackerProps) {
           );
         })}
         {goals.length === 0 && !isAdding && (
-          <p className="text-center text-sm text-gray-500">No active goals yet. Click + to add one.</p>
+          <p className="text-center text-sm text-gray-500">
+            No active goals yet. Click + to add one.
+          </p>
         )}
       </div>
     </div>

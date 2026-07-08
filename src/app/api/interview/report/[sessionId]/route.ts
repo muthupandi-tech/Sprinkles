@@ -12,7 +12,10 @@ const openrouter = createOpenAI({
 export async function POST(req: Request, { params }: { params: Promise<{ sessionId: string }> }) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -25,9 +28,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ session
       include: {
         questions: {
           include: { answer: true },
-          orderBy: { order: "asc" }
-        }
-      }
+          orderBy: { order: "asc" },
+        },
+      },
     });
 
     if (!session || session.userId !== user.id) {
@@ -40,13 +43,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ session
     }
 
     // Prepare transcript for AI
-    const transcript = session.questions.map(q => {
-      let txt = `Q${q.order}: ${q.questionText}\n`;
-      if (q.answer) {
-        txt += `A${q.order}: ${q.answer.studentAnswer}\n[Scores - Grammar: ${q.answer.grammarScore}, Fluency: ${q.answer.fluencyScore}, Technical: ${q.answer.technicalAccuracy}]\n`;
-      }
-      return txt;
-    }).join("\n");
+    const transcript = session.questions
+      .map((q) => {
+        let txt = `Q${q.order}: ${q.questionText}\n`;
+        if (q.answer) {
+          txt += `A${q.order}: ${q.answer.studentAnswer}\n[Scores - Grammar: ${q.answer.grammarScore}, Fluency: ${q.answer.fluencyScore}, Technical: ${q.answer.technicalAccuracy}]\n`;
+        }
+        return txt;
+      })
+      .join("\n");
 
     const systemPrompt = `You are a Senior Career Coach at ${session.company}.
     You just concluded a ${session.interviewType} interview with a candidate.
@@ -81,26 +86,27 @@ export async function POST(req: Request, { params }: { params: Promise<{ session
           strengths: result.object.strengths,
           weaknesses: result.object.weaknesses,
           tips: result.object.tips,
-        }
+        },
       },
       include: {
         questions: {
           include: { answer: true },
-          orderBy: { order: "asc" }
-        }
-      }
+          orderBy: { order: "asc" },
+        },
+      },
     });
 
     // Update global progress
     const progress = await prisma.progress.findUnique({ where: { userId: user.id } });
     if (progress) {
-      const newScore = progress.interviewScore === 0 
-        ? result.object.overallScore 
-        : (progress.interviewScore + result.object.overallScore) / 2;
-        
+      const newScore =
+        progress.interviewScore === 0
+          ? result.object.overallScore
+          : (progress.interviewScore + result.object.overallScore) / 2;
+
       await prisma.progress.update({
         where: { userId: user.id },
-        data: { interviewScore: newScore }
+        data: { interviewScore: newScore },
       });
     }
 

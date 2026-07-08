@@ -4,7 +4,10 @@ import { prisma } from "@/infrastructure/database/prisma";
 export async function GET(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -24,10 +27,10 @@ export async function GET(req: Request) {
         userId: user.id,
         date: {
           gte: startDate,
-          lte: endDate
-        }
+          lte: endDate,
+        },
       },
-      orderBy: { date: "asc" }
+      orderBy: { date: "asc" },
     });
 
     return Response.json({ success: true, events });
@@ -40,7 +43,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -54,8 +60,8 @@ export async function POST(req: Request) {
         title,
         date: new Date(date),
         type,
-        completed: false
-      }
+        completed: false,
+      },
     });
 
     return Response.json({ success: true, event: newEvent });
@@ -68,7 +74,10 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -78,7 +87,7 @@ export async function PATCH(req: Request) {
 
     const updatedEvent = await prisma.calendarEvent.update({
       where: { id, userId: user.id },
-      data: { completed }
+      data: { completed },
     });
 
     return Response.json({ success: true, event: updatedEvent });

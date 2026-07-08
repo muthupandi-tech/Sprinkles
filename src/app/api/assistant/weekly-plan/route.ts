@@ -12,7 +12,10 @@ const openrouter = createOpenAI({
 export async function GET(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -20,7 +23,7 @@ export async function GET(req: Request) {
 
     const plan = await prisma.weeklyPlan.findFirst({
       where: { userId: user.id, status: "active" },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     return Response.json({ success: true, plan });
@@ -33,18 +36,21 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
     const profile = await prisma.studentProfile.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     const progress = await prisma.progress.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     const { object } = await generateObject({
@@ -58,21 +64,36 @@ User Info:
 Create a realistic weekly plan including Vocabulary, Speech Practice, Mock Interview, Group Discussion, and Pronunciation.`,
       prompt: "Generate a weekly plan.",
       schema: z.object({
-        days: z.array(z.object({
-          dayName: z.string().describe("e.g., Monday, Tuesday, etc."),
-          tasks: z.array(z.object({
-            title: z.string(),
-            type: z.enum(["vocabulary", "speech", "interview", "gd", "pronunciation", "general"]),
-            completed: z.boolean()
-          })).max(3)
-        })).length(7)
-      })
+        days: z
+          .array(
+            z.object({
+              dayName: z.string().describe("e.g., Monday, Tuesday, etc."),
+              tasks: z
+                .array(
+                  z.object({
+                    title: z.string(),
+                    type: z.enum([
+                      "vocabulary",
+                      "speech",
+                      "interview",
+                      "gd",
+                      "pronunciation",
+                      "general",
+                    ]),
+                    completed: z.boolean(),
+                  })
+                )
+                .max(3),
+            })
+          )
+          .length(7),
+      }),
     });
 
     // Archive previous plans
     await prisma.weeklyPlan.updateMany({
       where: { userId: user.id, status: "active" },
-      data: { status: "archived" }
+      data: { status: "archived" },
     });
 
     const startDate = new Date();
@@ -85,8 +106,8 @@ Create a realistic weekly plan including Vocabulary, Speech Practice, Mock Inter
         startDate,
         endDate,
         status: "active",
-        tasksJson: object.days
-      }
+        tasksJson: object.days,
+      },
     });
 
     return Response.json({ success: true, plan: newPlan });
@@ -99,7 +120,10 @@ Create a realistic weekly plan including Vocabulary, Speech Practice, Mock Inter
 export async function PATCH(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -109,7 +133,7 @@ export async function PATCH(req: Request) {
 
     const updatedPlan = await prisma.weeklyPlan.update({
       where: { id: planId, userId: user.id },
-      data: { tasksJson }
+      data: { tasksJson },
     });
 
     return Response.json({ success: true, plan: updatedPlan });

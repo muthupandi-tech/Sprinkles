@@ -2,7 +2,17 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, BookOpen, Award, Compass, ArrowRight, X, Play, CheckCircle, Users } from "lucide-react";
+import {
+  Mic,
+  BookOpen,
+  Award,
+  Compass,
+  ArrowRight,
+  X,
+  Play,
+  CheckCircle,
+  Users,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface PracticeModule {
@@ -126,8 +136,8 @@ export default function PracticeCenterPage() {
           "Select a GD Topic and mode.",
           "Join a dynamic video-call style session with AI participants.",
           "Turn on your microphone and jump into the discussion.",
-          "You will be evaluated on your leadership and participation."
-        ]
+          "You will be evaluated on your leadership and participation.",
+        ],
       },
     },
   ];

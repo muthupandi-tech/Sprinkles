@@ -4,7 +4,10 @@ import { prisma } from "@/infrastructure/database/prisma";
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
@@ -17,9 +20,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
       include: {
         questions: {
           include: { answer: true },
-          orderBy: { order: "asc" }
-        }
-      }
+          orderBy: { order: "asc" },
+        },
+      },
     });
 
     if (!session || session.userId !== user.id) {

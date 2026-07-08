@@ -4,7 +4,17 @@ import { useChat, type Message } from "ai/react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Send, Loader2, Bot, User, AlertCircle, Copy, Check, Sparkles, RefreshCw } from "lucide-react";
+import {
+  Send,
+  Loader2,
+  Bot,
+  User,
+  AlertCircle,
+  Copy,
+  Check,
+  Sparkles,
+  RefreshCw,
+} from "lucide-react";
 import { getMessages } from "@/app/actions/chat";
 
 interface ChatAreaProps {
@@ -16,7 +26,7 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [isGeneratingFeedback, setIsGeneratingFeedback] = useState(false);
-  
+
   const generateFeedback = async () => {
     if (!conversationId) return;
     setIsGeneratingFeedback(true);
@@ -34,20 +44,21 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
       setIsGeneratingFeedback(false);
     }
   };
-  
-  const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, reload } = useChat({
-    api: "/api/chat",
-    body: {
-      conversationId,
-    },
-    initialMessages,
-    onResponse: (response) => {
-      const newConversationId = response.headers.get("x-conversation-id");
-      if (newConversationId && !conversationId) {
-        onConversationCreated(newConversationId);
-      }
-    },
-  });
+
+  const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, reload } =
+    useChat({
+      api: "/api/chat",
+      body: {
+        conversationId,
+      },
+      initialMessages,
+      onResponse: (response) => {
+        const newConversationId = response.headers.get("x-conversation-id");
+        if (newConversationId && !conversationId) {
+          onConversationCreated(newConversationId);
+        }
+      },
+    });
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +75,7 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
         setInitialMessages([]);
         return;
       }
-      
+
       setLoadingHistory(true);
       const res = await getMessages(conversationId);
       if (res.success && res.messages) {
@@ -79,7 +90,7 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
       }
       setLoadingHistory(false);
     }
-    
+
     loadMessages();
   }, [conversationId, setMessages]);
 
@@ -101,19 +112,23 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
       {/* Chat Header */}
       {conversationId && messages.length > 0 && (
-        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3 bg-gray-50/50">
+        <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50/50 px-4 py-3">
           <span className="text-sm font-medium text-gray-700">Coach Session Active</span>
           <button
             onClick={generateFeedback}
             disabled={isGeneratingFeedback}
-            className="flex items-center gap-2 rounded-lg bg-white border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:text-blue-600 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:text-blue-600 disabled:opacity-50"
           >
-            {isGeneratingFeedback ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+            {isGeneratingFeedback ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Check className="h-3.5 w-3.5" />
+            )}
             Finish Chat & Get Feedback
           </button>
         </div>
       )}
-      
+
       {/* Messages Body */}
       <div className="flex-1 space-y-6 overflow-y-auto p-4 md:p-6">
         {loadingHistory ? (
@@ -128,14 +143,15 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
             </div>
             <h2 className="text-xl font-extrabold text-gray-900">Sprinkles AI Coach</h2>
             <p className="mt-2 max-w-md text-sm text-gray-500">
-              Your personal mentor for spoken English, interview prep, vocabulary, and confident communication.
+              Your personal mentor for spoken English, interview prep, vocabulary, and confident
+              communication.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-2">
               {suggestions.map((sug) => (
                 <button
                   key={sug}
                   onClick={() => handleSuggestion(sug)}
-                  className="cursor-pointer rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 transition-all hover:border-blue-500 hover:text-blue-600 shadow-sm"
+                  className="cursor-pointer rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 shadow-sm transition-all hover:border-blue-500 hover:text-blue-600"
                 >
                   {sug}
                 </button>
@@ -151,50 +167,59 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
               {/* Avatar circle */}
               <div
                 className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm ${
-                  msg.role === "user" ? "bg-blue-600 text-white" : "bg-purple-100 text-purple-700 border border-purple-200"
+                  msg.role === "user"
+                    ? "bg-blue-600 text-white"
+                    : "border border-purple-200 bg-purple-100 text-purple-700"
                 }`}
               >
-                {msg.role === "user" ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+                {msg.role === "user" ? (
+                  <User className="h-4 w-4" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
               </div>
 
               {/* Message block */}
-              <div className="space-y-1.5 min-w-0">
+              <div className="min-w-0 space-y-1.5">
                 <div
                   className={`rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${
                     msg.role === "user"
-                      ? "rounded-tr-none bg-blue-600 text-white shadow-md font-medium"
+                      ? "rounded-tr-none bg-blue-600 font-medium text-white shadow-md"
                       : "rounded-tl-none border border-gray-100 bg-gray-50 text-gray-800"
                   }`}
                 >
                   {msg.role === "user" ? (
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   ) : (
-                    <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-gray-100 prose-headings:font-bold prose-a:text-blue-600">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {msg.content}
-                      </ReactMarkdown>
+                    <div className="prose prose-sm prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-gray-100 prose-headings:font-bold prose-a:text-blue-600 max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                     </div>
                   )}
                 </div>
 
                 {/* Actions & Timestamp */}
-                <div className={`flex items-center gap-3 mt-1 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`mt-1 flex items-center gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
                   <span className="text-[10px] font-medium text-gray-400">
-                    {msg.createdAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {msg.createdAt?.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }) || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   </span>
-                  
+
                   {msg.role === "assistant" && (
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => copyToClipboard(msg.content)}
-                        className="text-gray-400 hover:text-gray-700 transition-colors"
+                        className="text-gray-400 transition-colors hover:text-gray-700"
                         title="Copy text"
                       >
                         <Copy className="h-3 w-3" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => reload()}
-                        className="text-gray-400 hover:text-gray-700 transition-colors"
+                        className="text-gray-400 transition-colors hover:text-gray-700"
                         title="Regenerate response"
                       >
                         <RefreshCw className="h-3 w-3" />
@@ -210,7 +235,7 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
         {/* Typing Indicator */}
         {isLoading && messages.length > 0 && messages[messages.length - 1].role === "user" && (
           <div className="mr-auto flex max-w-[80%] items-center gap-4">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-xs font-bold text-purple-700 border border-purple-200 shadow-sm">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-purple-200 bg-purple-100 text-xs font-bold text-purple-700 shadow-sm">
               <Sparkles className="h-4 w-4" />
             </div>
             <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-none border border-gray-100 bg-gray-50 px-5 py-4 text-sm shadow-sm">
@@ -235,18 +260,18 @@ export function ChatArea({ conversationId, onConversationCreated }: ChatAreaProp
             value={input}
             onChange={handleInputChange}
             placeholder="Ask Sprinkles a question or type 'vocab'..."
-            className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3 pr-12 text-sm font-medium transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+            className="w-full rounded-full border border-gray-200 bg-gray-50 px-5 py-3 pr-12 text-sm font-medium transition-all focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:outline-none"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="absolute right-1.5 top-1.5 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 disabled:shadow-none"
+            className="absolute top-1.5 right-1.5 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg disabled:opacity-50 disabled:shadow-none"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Send className="h-4 w-4 ml-0.5" />
+              <Send className="ml-0.5 h-4 w-4" />
             )}
           </button>
         </div>

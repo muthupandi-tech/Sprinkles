@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Users, Briefcase, BookOpen, Lightbulb, MessageSquare, ArrowRight, Loader2, Plus } from "lucide-react";
+import {
+  Users,
+  Briefcase,
+  BookOpen,
+  Lightbulb,
+  MessageSquare,
+  ArrowRight,
+  Loader2,
+  Plus,
+} from "lucide-react";
 
 export default function GDSetupPage() {
   const router = useRouter();
@@ -25,7 +34,7 @@ export default function GDSetupPage() {
     "Electric vehicles vs Fuel vehicles: The reality.",
     "Startups vs Government Jobs in India.",
     "Climate Change: Individual action vs Government policy.",
-    "Digital India: Successes and failures."
+    "Digital India: Successes and failures.",
   ];
 
   const handleStart = async (selectedTopic: string) => {
@@ -36,7 +45,7 @@ export default function GDSetupPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           category: selectedCategory,
-          topic: selectedTopic
+          topic: selectedTopic,
         }),
       });
 
@@ -56,7 +65,8 @@ export default function GDSetupPage() {
       <div>
         <h1 className="text-3xl font-extrabold text-gray-900">Group Discussion Simulator</h1>
         <p className="mt-2 text-gray-500">
-          Engage in dynamic, multi-agent group discussions. AI participants will react to your arguments, challenge your points, and evaluate your leadership and communication skills.
+          Engage in dynamic, multi-agent group discussions. AI participants will react to your
+          arguments, challenge your points, and evaluate your leadership and communication skills.
         </p>
       </div>
 
@@ -64,7 +74,7 @@ export default function GDSetupPage() {
         {/* Left Column: Config */}
         <div className="space-y-6">
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-gray-500">
+            <h2 className="mb-4 text-sm font-bold tracking-wider text-gray-500 uppercase">
               1. Select Discussion Mode
             </h2>
             <div className="grid grid-cols-2 gap-3">
@@ -84,7 +94,9 @@ export default function GDSetupPage() {
                     <div className={`rounded-lg border p-2 ${cat.color}`}>
                       <Icon className="h-4 w-4" />
                     </div>
-                    <span className={`text-sm font-bold ${isSelected ? "text-blue-700" : "text-gray-700"}`}>
+                    <span
+                      className={`text-sm font-bold ${isSelected ? "text-blue-700" : "text-gray-700"}`}
+                    >
                       {cat.id}
                     </span>
                   </button>
@@ -94,19 +106,23 @@ export default function GDSetupPage() {
           </div>
 
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-gray-500">
+            <h2 className="mb-4 text-sm font-bold tracking-wider text-gray-500 uppercase">
               2. Custom Topic (Optional)
             </h2>
             <p className="mb-3 text-xs text-gray-500">
-              Have a specific topic in mind? Enter it below, otherwise pick from the suggested list on the right.
+              Have a specific topic in mind? Enter it below, otherwise pick from the suggested list
+              on the right.
             </p>
             <div className="space-y-3">
               <input
                 type="text"
                 value={topic}
-                onChange={(e) => { setTopic(e.target.value); setCustomMode(true); }}
+                onChange={(e) => {
+                  setTopic(e.target.value);
+                  setCustomMode(true);
+                }}
                 placeholder="E.g., Space Exploration privatization..."
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none"
               />
               {customMode && topic.trim().length > 5 && (
                 <button
@@ -114,7 +130,11 @@ export default function GDSetupPage() {
                   disabled={isLoading}
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-blue-700 disabled:opacity-50"
                 >
-                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Users className="h-4 w-4" />}
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Users className="h-4 w-4" />
+                  )}
                   Start Custom GD
                 </button>
               )}
@@ -124,7 +144,7 @@ export default function GDSetupPage() {
 
         {/* Right Column: Suggested Topics */}
         <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gray-500">
+          <h2 className="mb-4 flex items-center gap-2 text-sm font-bold tracking-wider text-gray-500 uppercase">
             <Lightbulb className="h-4 w-4 text-yellow-500" />
             Suggested Topics
           </h2>

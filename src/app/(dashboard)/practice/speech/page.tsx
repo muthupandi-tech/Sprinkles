@@ -72,7 +72,8 @@ export default function SpeechPracticePage() {
             <span>Speech Practice</span>
           </h1>
           <p className="text-sm text-gray-500">
-            Record your speech, get live transcription, and receive AI feedback on your fluency and grammar.
+            Record your speech, get live transcription, and receive AI feedback on your fluency and
+            grammar.
           </p>
         </div>
       </div>
@@ -83,7 +84,7 @@ export default function SpeechPracticePage() {
           <Lightbulb className="h-6 w-6" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-blue-600">
+          <h2 className="text-xs font-bold tracking-wider text-blue-600 uppercase">
             Daily Speaking Challenge
           </h2>
           <p className="text-lg font-medium text-gray-900">{todaysTopic}</p>

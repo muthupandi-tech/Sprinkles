@@ -15,10 +15,7 @@ export async function POST(req: Request) {
     const { title, type, target, deadline } = await req.json();
 
     if (!title || !type || !target) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const goal = await prisma.goal.create({
@@ -34,9 +31,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ goal });
   } catch (error) {
     console.error("Error creating goal:", error);
-    return NextResponse.json(
-      { error: "Failed to create goal" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create goal" }, { status: 500 });
   }
 }

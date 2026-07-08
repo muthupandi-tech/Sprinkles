@@ -1,4 +1,3 @@
-
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateObject } from "ai";
 import { z } from "zod";
@@ -31,8 +30,8 @@ export class AnalyticsService {
     // 2. Format data for the prompt
     const promptContext = `
       User Progress: Overall Score ${progress.overallScore}, Speaking ${progress.speakingScore}, Vocabulary ${progress.vocabularyScore}, Pronunciation ${progress.pronunciationScore}, Interview ${progress.interviewScore}.
-      Recent Practice Sessions: ${JSON.stringify(recentSessions.map(s => ({ type: s.type, score: s.score, feedback: s.feedback })))}
-      Recent Interviews: ${JSON.stringify(recentInterviews.map(i => ({ type: i.interviewType, score: i.overallScore, feedback: i.feedbackJson })))}
+      Recent Practice Sessions: ${JSON.stringify(recentSessions.map((s) => ({ type: s.type, score: s.score, feedback: s.feedback })))}
+      Recent Interviews: ${JSON.stringify(recentInterviews.map((i) => ({ type: i.interviewType, score: i.overallScore, feedback: i.feedbackJson })))}
     `;
 
     // 3. Generate Insights & Recommendations using AI SDK
@@ -44,21 +43,23 @@ export class AnalyticsService {
       prompt: promptContext,
       schema: z.object({
         insights: z.array(z.string()).length(3),
-        recommendations: z.array(
-          z.object({
-            content: z.string(),
-            type: z.enum(["pronunciation", "interview", "vocabulary", "fluency", "general"]),
-          })
-        ).length(3),
+        recommendations: z
+          .array(
+            z.object({
+              content: z.string(),
+              type: z.enum(["pronunciation", "interview", "vocabulary", "fluency", "general"]),
+            })
+          )
+          .length(3),
       }),
     });
 
     // 4. Save new recommendations to database
     // Clear old recommendations first to keep the dashboard clean
     await prisma.recommendation.deleteMany({ where: { userId } });
-    
+
     await prisma.recommendation.createMany({
-      data: object.recommendations.map(r => ({
+      data: object.recommendations.map((r) => ({
         userId,
         content: r.content,
         type: r.type,

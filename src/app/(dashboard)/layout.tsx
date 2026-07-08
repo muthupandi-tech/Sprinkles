@@ -25,6 +25,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { label: "AI Assistant", href: "/ai-assistant", icon: Sparkles },
     { label: "Practice", href: "/practice", icon: Mic },
     { label: "Analytics", href: "/analytics", icon: BarChart2 },
+    { label: "Achievements", href: "/achievements", icon: Flame },
     { label: "Profile", href: "/profile", icon: User },
     { label: "Settings", href: "/settings", icon: Settings },
   ];

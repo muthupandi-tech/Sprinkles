@@ -11,14 +11,17 @@ const openrouter = createOpenAI({
 export async function GET(req: Request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error || !user) {
       return new Response("Unauthorized", { status: 401 });
     }
 
     const progress = await prisma.progress.findUnique({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
 
     const { text } = await generateText({
@@ -33,7 +36,7 @@ Current Stats:
 - Pronunciation: ${progress?.pronunciationScore}%
 
 Make it specific, positive, and direct. E.g., "Your pronunciation improved this week. Keep up the 3-day streak!"`,
-      prompt: "Generate a short motivational message."
+      prompt: "Generate a short motivational message.",
     });
 
     return Response.json({ success: true, message: text });

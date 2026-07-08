@@ -14,10 +14,12 @@ import {
   AlertCircle,
   Save,
 } from "lucide-react";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { signOut } from "@/app/auth/actions";
 
 export default function SettingsPage() {
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+  const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState({
     dailyReminder: true,
     weeklyReport: true,
@@ -31,9 +33,6 @@ export default function SettingsPage() {
     confirmPassword: "",
   });
 
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
   const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
@@ -45,28 +44,24 @@ export default function SettingsPage() {
 
   const handleSaveNotifications = (e: React.FormEvent) => {
     e.preventDefault();
-    setSuccess("Notification preferences saved successfully!");
-    setTimeout(() => setSuccess(null), 3000);
+    toast.success("Notification preferences saved successfully!");
   };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError("New passwords do not match.");
+      toast.error("New passwords do not match.");
       return;
     }
 
     if (passwordForm.newPassword.length < 6) {
-      setError("Password must be at least 6 characters.");
+      toast.error("Password must be at least 6 characters.");
       return;
     }
 
-    setSuccess("Password updated successfully!");
+    toast.success("Password updated successfully!");
     setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    setTimeout(() => setSuccess(null), 3000);
   };
 
   return (
@@ -81,20 +76,6 @@ export default function SettingsPage() {
           Manage your interface theme, email reminders, security passwords, and session actions.
         </p>
       </div>
-
-      {success && (
-        <div className="flex items-center gap-2 rounded-2xl border border-green-100 bg-green-50 p-4 text-sm text-green-700 shadow-sm">
-          <CheckCircle className="h-5 w-5 shrink-0" />
-          <p className="font-medium">{success}</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="flex items-center gap-2 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
-          <AlertCircle className="h-5 w-5 shrink-0" />
-          <p className="font-medium">{error}</p>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 gap-6">
         {/* Card 1: Theme preferences */}
