@@ -151,6 +151,10 @@ export default function PracticeCenterPage() {
       router.push("/practice/interview");
     } else if (selectedModule?.id === "gd") {
       router.push("/practice/gd");
+    } else if (selectedModule?.id === "vocabulary") {
+      router.push("/practice/vocabulary");
+    } else if (selectedModule?.id === "pronunciation") {
+      router.push("/practice/pronunciation");
     } else {
       setSessionActive(true);
     }

@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     }
 
     const wordsPool = userVocabs.map((uv) => ({
-      id: uv.wordId,
+      wordId: uv.wordId,
       word: uv.word.word,
       meaning: uv.word.meaning,
     }));
@@ -119,13 +119,17 @@ export async function POST(req: Request) {
               wordId: z.string().describe("The ID of the target vocabulary word being tested"),
             })
           )
-          .length(5),
+          .min(3)
+          .max(10),
       }),
     });
 
     return Response.json({ success: true, quiz: result.object });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Quiz Error:", error);
-    return new Response("Internal Server Error", { status: 500 });
+    return new Response(JSON.stringify({ error: error.message || "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
