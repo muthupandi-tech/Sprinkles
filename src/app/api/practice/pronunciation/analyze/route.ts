@@ -69,8 +69,15 @@ export async function POST(req: Request) {
           .array(
             z.object({
               word: z.string(),
+              studentTranscriptWord: z.string().describe("What the student actually said (e.g., 'tought' instead of 'thought')"),
               ipa: z.string().describe("International Phonetic Alphabet representation of the correct pronunciation"),
+              reason: z.string().describe("Why this happened (e.g. 'The tongue stayed behind the teeth instead of between them.')"),
+              mouthPosition: z.string().describe("E.g. 'Slightly open'"),
+              tonguePosition: z.string().describe("E.g. 'Between the teeth'"),
+              airFlow: z.string().describe("E.g. 'Continuous air flow'"),
+              voiceOnOff: z.string().describe("E.g. 'Voice Off (voiceless)'"),
               tip: z.string().describe("Tip on how to pronounce this correctly"),
+              minimalPairs: z.array(z.string()).describe("Minimal pairs for practice (e.g., 'though', 'through', 'three', 'tree')"),
             })
           )
           .describe("Words from the drill text that were likely mispronounced based on the transcript"),

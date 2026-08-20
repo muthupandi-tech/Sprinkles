@@ -9,6 +9,8 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from "lucide-react";
+import { SentencePlayer } from "@/components/practice/SentencePlayer";
+import { InteractiveMispronouncedWord } from "@/components/practice/InteractiveMispronouncedWord";
 
 export default async function PronunciationResultPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -91,6 +93,12 @@ export default async function PronunciationResultPage({ params }: { params: Prom
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left Column: Transcripts & Details */}
         <div className="space-y-8 lg:col-span-2">
+          <SentencePlayer 
+            targetText={attempt.targetText || ""} 
+            oldScore={attempt.pronunciationScore || 0}
+            originalTranscript={attempt.transcription || ""}
+          />
+
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-gray-900">
               <MessageSquare className="h-5 w-5 text-gray-400" />
@@ -108,13 +116,7 @@ export default async function PronunciationResultPage({ params }: { params: Prom
             </h3>
             <div className="space-y-4">
               {feedback.mispronouncedWords?.map((item: any, i: number) => (
-                <div key={i} className="rounded-xl bg-white/60 p-4 text-sm shadow-sm border border-red-100/50">
-                  <div className="flex items-center gap-2 font-bold text-gray-900">
-                    <span className="text-red-600">{item.word}</span>
-                    <span className="text-xs font-mono text-gray-400 bg-gray-100 px-2 py-0.5 rounded">/{item.ipa}/</span>
-                  </div>
-                  <p className="mt-2 text-sm text-gray-700">{item.tip}</p>
-                </div>
+                <InteractiveMispronouncedWord key={i} item={item} />
               ))}
               {(!feedback.mispronouncedWords || feedback.mispronouncedWords.length === 0) && (
                 <p className="text-sm text-gray-700">Excellent! No major mispronunciations detected.</p>
