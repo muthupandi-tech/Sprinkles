@@ -24,7 +24,7 @@ export async function signUp(email: string, password: string, name: string) {
     return { success: false, error: error.message };
   }
 
-  return { success: true, user: data.user };
+  return { success: true };
 }
 
 export async function signIn(email: string, password: string) {
@@ -39,7 +39,7 @@ export async function signIn(email: string, password: string) {
     return { success: false, error: error.message };
   }
 
-  return { success: true, user: data.user };
+  return { success: true };
 }
 
 export async function signInWithGoogle() {
