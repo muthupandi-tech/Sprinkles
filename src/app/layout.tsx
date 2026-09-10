@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Sprinkles | AI Personal Communication & Spoken English Coach",
@@ -44,6 +45,7 @@ export default function RootLayout({
           <main className="flex flex-grow flex-col">{children}</main>
           <Toaster position="top-right" />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
